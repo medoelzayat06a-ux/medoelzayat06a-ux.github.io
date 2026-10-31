@@ -1,0 +1,8 @@
+[{
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "io.github.medoelzayat06a_ux.twa",
+        "sha256_cert_fingerprints": ["59:2A:46:C0:C8:A5:4B:05:4A:5C:B0:7A:6B:21:D2:CE:1F:EA:98:3C:EA:49:A7:93:06:FE:11:A7:AB:44:B0:07"]
+      }
+    }]
