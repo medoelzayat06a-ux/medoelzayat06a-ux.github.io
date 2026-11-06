@@ -1,1016 +1,582 @@
-<!doctype html>
-<html lang="ar" dir="rtl">
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="dark">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<link rel="manifest" href="manifest.json">
-<link rel="icon" href="icon-192.png">
-<link rel="apple-touch-icon" href="icon-192.png">
-<meta name="theme-color" content="#0b6cf0">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<title>محاكاة متتبع الشمس والبطارية (نسخة v4)</title>
+<meta name="google-site-verification" content="bbwParFe1G72hyUCfX8-sQLkmY0hoYAU5oF_DUCn_mY" />
+<title>Fritzing — نسخة جاهزة لويندوز</title>
+<meta name="description" content="Fritzing portable build for Windows 64-bit — نسخة Fritzing جاهزة للتشغيل على ويندوز">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M18 2 6 18h8l-2 12 12-16h-8z' fill='%23ffb627'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;700&display=swap" rel="stylesheet">
+
+<!-- Privacy-friendly analytics by Plausible -->
+<script async src="https://plausible.io/js/pa-7veFFHxix6oN9IoQL67vc.js"></script>
+<script>
+  window.plausible=window.plausible||function(){(plausible.q=plausible.q||[]).push(arguments)},plausible.init=plausible.init||function(i){plausible.o=i||{}};
+  plausible.init()
+</script>
+
 <style>
-  :root {
-    --fg: #1c1f24; --muted: #646b76; --border: #d6dae1; --subtle: #e8ebef;
-    --card: #ffffff; --inset: #f4f6f9; --accent: #0b6cf0;
-    --panel: #1e3a5f; --panel-hi: #2f5d8f; --sun: #f5b400; --ray: #f5b400;
-    --c-fix: #8a919c; --c-trk: #0b6cf0; --c-ideal: #12b886; --c-err: #d92d20; --c-mot: #f2740d;
-    --ok: #067647; --warn: #b54708; --bad: #b42318;
+:root{
+  --bg:#e8edf1; --ink:#14202b; --muted:#4b5b69; --panel:#f7f9fb; --line:#c6d0d8;
+  --hole:#b5c1cb; --wire:#d6453d; --accent:#1d4ed8; --accent-ink:#fff; --warn:#8a5a00; --warn-bg:#fff3d6;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#10181f; --ink:#e7eef4; --muted:#9db0bf; --panel:#17222b; --line:#2b3a46;
+    --hole:#2a3945; --wire:#ff6b61; --accent:#7aa2ff; --accent-ink:#0b1220; --warn:#ffd27a; --warn-bg:#2a2210;
   }
-  @media (prefers-color-scheme: dark) {
-    :root:not([data-theme=light]) {
-      --fg: #e6e9ee; --muted: #98a2b0; --border: #3a4149; --subtle: #2b3138;
-      --card: #1c2128; --inset: #141a21; --accent: #63a5ff;
-      --panel: #2b4f7a; --panel-hi: #4475a8; --sun: #ffd166; --ray: #ffd166;
-      --c-fix: #6b7681; --c-trk: #63a5ff; --c-ideal: #3ddc97; --c-err: #ff6b5e; --c-mot: #ff9d4d;
-      --ok: #3ddc97; --warn: #fdb022; --bad: #ff7a6b;
-    }
-  }
-  * { box-sizing: border-box; }
-  body { margin: 0; padding: 18px; background: var(--inset); color: var(--fg);
-    font-family: "Segoe UI", Tahoma, system-ui, "Noto Sans Arabic", sans-serif; font-size: 14px; line-height: 1.6; }
-  .app { max-width: 1200px; margin: 0 auto; display: flex; flex-direction: column; gap: 14px; }
-  h1 { font-size: 20px; font-weight: 500; margin: 0; }
-  h2 { font-size: 14px; font-weight: 500; margin: 0 0 10px; color: var(--muted); }
-  .sub { margin: 4px 0 0; color: var(--muted); font-size: 13px; }
-  .panel { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; }
-  .head { display: flex; justify-content: space-between; gap: 14px; flex-wrap: wrap; align-items: flex-start; }
-  button, select, input[type=date], input[type=time], input[type=number] { font: inherit; font-size: 13px; color: var(--fg); background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 5px 9px; }
-  button { cursor: pointer; }
-  button:hover { background: var(--subtle); }
-  button[aria-pressed=true] { border-color: var(--accent); color: var(--accent); }
-  input[type=number] { width: 70px; }
-  .row { display: flex; flex-wrap: wrap; gap: 14px 22px; align-items: flex-end; }
-  .field { display: flex; flex-direction: column; gap: 4px; flex: 1 1 190px; min-width: 170px; }
-  .field > label { font-size: 12.5px; color: var(--muted); display: flex; justify-content: space-between; gap: 8px; }
-  .num { color: var(--fg); font-variant-numeric: tabular-nums; direction: ltr; }
-  input[type=range] { width: 100%; accent-color: var(--accent); }
-  .presets { display: flex; gap: 6px; flex-wrap: wrap; }
-  .presets button { border-radius: 999px; }
-  .views { display: grid; grid-template-columns: 1fr; gap: 14px; }
-  @media (min-width: 900px) { .views { grid-template-columns: 1.35fr 1fr; } }
-  svg { display: block; width: 100%; height: auto; }
-  svg text { font-family: inherit; font-size: 11px; fill: var(--muted); }
-  svg .big { font-size: 13px; fill: var(--fg); }
-  .gl { stroke: var(--subtle); stroke-width: 1; fill: none; }
-  .kv { display: grid; grid-template-columns: 1fr auto; gap: 0 14px; font-size: 13px; }
-  .kv > div { padding: 5px 0; border-bottom: 1px solid var(--subtle); }
-  .kv > div:nth-child(2n) { text-align: left; direction: ltr; font-variant-numeric: tabular-nums; }
-  .k { color: var(--muted); }
-  .badges { display: flex; flex-wrap: wrap; gap: 8px; min-height: 28px; align-items: center; margin-top: 10px; }
-  .badge { font-size: 12.5px; border: 1px solid var(--border); border-radius: 999px; padding: 2px 11px; color: var(--muted); }
-  .badge.ok { border-color: var(--ok); color: var(--ok); }
-  .badge.warn { border-color: var(--warn); color: var(--warn); }
-  .badge.bad { border-color: var(--bad); color: var(--bad); }
-  .scrub { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-top: 10px; }
-  .scrub input[type=range] { flex: 1 1 420px; }
-  .legend { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 12.5px; color: var(--muted); margin-bottom: 6px; }
-  .legend i { display: inline-block; width: 18px; height: 3px; border-radius: 2px; vertical-align: middle; margin-inline-end: 6px; }
-  table { width: 100%; border-collapse: collapse; font-size: 13px; }
-  th, td { text-align: right; padding: 6px 8px; border-bottom: 1px solid var(--subtle); white-space: nowrap; }
-  th { color: var(--muted); font-weight: 500; }
-  td.n { font-variant-numeric: tabular-nums; direction: ltr; text-align: left; }
-  tr.best td { color: var(--ok); }
-  .loadtbl td { white-space: normal; }
-  .checks { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 13px; }
-  .checks label { display: inline-flex; gap: 6px; align-items: center; }
-  .note { font-size: 12.5px; color: var(--muted); }
-  .verdict { font-size: 13px; margin-top: 10px; }
-  .verdict div { margin-bottom: 4px; }
-  .foot { color: var(--muted); font-size: 12px; text-align: center; }
-  .log { max-height: 280px; overflow: auto; font-size: 13px; }
-  .day-row { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; padding: 6px 0; border-bottom: 1px solid var(--subtle); }
-  .day-row span:first-child { direction: ltr; text-align: left; font-variant-numeric: tabular-nums; }
-  input[type=text] { font: inherit; font-size: 13px; color: var(--fg); background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 5px 9px; }
-  @media (max-width: 640px) { body { padding: 10px; } h1 { font-size: 17px; } .panel { padding: 10px; } }
-  @media print { .presets, .scrub, button { display: none; } }
+}
+*{box-sizing:border-box}
+html{scroll-padding-top:1rem}
+body{
+  margin:0; font-family:"IBM Plex Sans Arabic",system-ui,"Segoe UI",Tahoma,sans-serif;
+  background:var(--bg); color:var(--ink); line-height:1.7; font-size:1.0625rem;
+}
+.wrap{max-width:56rem; margin:0 auto; padding:0 1.25rem}
+.board{
+  background-image:radial-gradient(var(--hole) 2px, transparent 2.5px);
+  background-size:22px 22px; background-position:11px 11px;
+  border-bottom:1px solid var(--line);
+}
+.top{display:flex; justify-content:flex-end; padding:1rem 0}
+.lang{
+  font:inherit; font-size:.95rem; color:var(--ink); background:var(--panel);
+  border:1px solid var(--line); border-radius:999px; padding:.3rem 1rem; cursor:pointer;
+}
+.lang:hover{border-color:var(--accent)}
+:focus-visible{outline:3px solid var(--accent); outline-offset:3px}
+.hero{padding:2.5rem 0 4rem; position:relative}
+h1{font-size:clamp(3.5rem,13vw,7rem); line-height:1; margin:0 0 .75rem; font-weight:700; letter-spacing:-.02em}
+.lead{max-width:34rem; color:var(--muted); margin:0 0 2rem}
+.cta{display:flex; align-items:center; gap:1.25rem; flex-wrap:wrap}
+.btn{
+  display:inline-block; background:var(--accent); color:var(--accent-ink); text-decoration:none;
+  font-weight:700; padding:.9rem 2rem; border-radius:.5rem; font-size:1.15rem;
+  box-shadow:0 0 0 4px var(--bg), 0 0 0 6px var(--accent);
+}
+.btn:hover{filter:brightness(1.1)}
+.wire{position:absolute; inset-inline-end:0; top:2rem; width:min(46%,22rem); height:auto; pointer-events:none}
+@media (max-width:42rem){.wire{display:none}}
+.cta small{color:var(--muted)}
+
+section{padding:2.5rem 0}
+h2{font-size:1.6rem; margin:0 0 1.25rem}
+h3{font-size:1.1rem; margin:0 0 .15rem}
+dl.spec{display:grid; grid-template-columns:repeat(auto-fit,minmax(10rem,1fr)); gap:0; margin:0; border:1px solid var(--line); border-radius:.5rem; background:var(--panel); overflow:hidden}
+dl.spec div{padding:1rem 1.25rem; border-inline-end:1px solid var(--line)}
+dl.spec div:last-child{border-inline-end:0}
+dt{font-size:.9rem; color:var(--muted)}
+dd{margin:0; font-weight:700}
+ol.steps{list-style:none; margin:0; padding:0; counter-reset:s; border-inline-start:3px solid var(--wire); padding-inline-start:1.5rem}
+ol.steps li{counter-increment:s; position:relative; padding-bottom:1.5rem}
+ol.steps li:last-child{padding-bottom:0}
+ol.steps li::before{
+  content:counter(s); position:absolute; inset-inline-start:calc(-1.5rem - 3px - 1.0rem);
+  width:2rem; height:2rem; border-radius:50%; background:var(--wire); color:#fff; font-weight:700;
+  display:grid; place-items:center; font-size:.95rem;
+}
+ol.steps p{margin:0; color:var(--muted)}
+code{font-family:ui-monospace,Consolas,monospace; background:var(--panel); border:1px solid var(--line); border-radius:.25rem; padding:.05rem .4rem; font-size:.95em; direction:ltr; unicode-bidi:isolate}
+.notes{display:grid; gap:1rem}
+.note{background:var(--panel); border:1px solid var(--line); border-radius:.5rem; padding:1rem 1.25rem}
+.note p{margin:0; color:var(--muted)}
+.note.warn{background:var(--warn-bg); border-color:var(--warn)}
+.note.warn h3{color:var(--warn)}
+a{color:var(--accent)}
+footer{border-top:1px solid var(--line); padding:1.5rem 0 2.5rem; color:var(--muted); font-size:.95rem}
+
+
+/* ---------- motion ---------- */
+.board{position:relative; overflow:hidden}
+.board::before{
+  content:""; position:absolute; inset:0; pointer-events:none;
+  background-image:radial-gradient(var(--accent) 3px, transparent 3.5px);
+  background-size:22px 22px; background-position:11px 11px;
+  -webkit-mask-image:radial-gradient(circle 130px at var(--mx,-999px) var(--my,-999px),#000,transparent);
+  mask-image:radial-gradient(circle 130px at var(--mx,-999px) var(--my,-999px),#000,transparent);
+}
+.board .wrap{position:relative; z-index:1}
+.wire{top:.5rem; width:min(48%,26rem)}
+.trace{stroke-dasharray:1; stroke-dashoffset:0; animation:draw 1.5s .5s cubic-bezier(.6,0,.3,1) both}
+@keyframes draw{from{stroke-dashoffset:1}to{stroke-dashoffset:0}}
+.pin{animation:pop .4s .3s cubic-bezier(.3,1.6,.5,1) both; transform-box:fill-box; transform-origin:center}
+@keyframes pop{from{transform:scale(0)}to{transform:scale(1)}}
+.led{fill:#ffd24a; transform-box:fill-box; transform-origin:center;
+  animation:ledOn .5s 2s cubic-bezier(.3,1.6,.5,1) both, glow 2.2s 2.6s ease-in-out infinite}
+@keyframes ledOn{from{fill:var(--panel); transform:scale(.4); filter:none}to{fill:#ffd24a; transform:scale(1); filter:drop-shadow(0 0 10px #ffd24a)}}
+@keyframes glow{0%,100%{filter:drop-shadow(0 0 6px #ffd24a)}50%{filter:drop-shadow(0 0 16px #ffb800)}}
+
+.ch{display:inline-block}
+.js .ch{animation:drop .7s cubic-bezier(.2,.9,.3,1.25) both; animation-delay:calc(var(--i) * 70ms + .1s)}
+@keyframes drop{from{opacity:0; transform:translateY(-.6em)}to{opacity:1; transform:none}}
+.js .lead{animation:rise .7s .7s both}
+.js .cta{animation:rise .7s .9s both}
+@keyframes rise{from{opacity:0; transform:translateY(14px)}to{opacity:1; transform:none}}
+
+.btn{transition:transform .18s, filter .18s; animation:ring 2.8s 2.4s infinite}
+.btn:hover{transform:translateY(-3px)}
+.btn:active{transform:translateY(1px)}
+@keyframes ring{
+  0%{box-shadow:0 0 0 4px var(--bg),0 0 0 6px var(--accent),0 0 0 6px var(--accent)}
+  70%,100%{box-shadow:0 0 0 4px var(--bg),0 0 0 6px var(--accent),0 0 0 24px transparent}
+}
+
+.js .reveal{opacity:0; transform:translateY(22px); transition:opacity .6s ease, transform .6s cubic-bezier(.2,.8,.3,1)}
+.js .reveal.in{opacity:1; transform:none}
+.js ol.steps li::before{transform:scale(0); transition:transform .5s .2s cubic-bezier(.3,1.7,.5,1)}
+.js ol.steps li.in::before{transform:scale(1)}
+.note{transition:transform .2s, border-color .2s, opacity .6s}
+.note:hover{transform:translateY(-3px); border-color:var(--accent)}
+dl.spec div{transition:background .2s}
+dl.spec div:hover{background:var(--bg)}
+.js .note.reveal.in:hover{transform:translateY(-3px)}
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none !important; transition:none !important}
+  .js .reveal,.js .ch{opacity:1 !important; transform:none !important}
+  .js ol.steps li::before{transform:none !important}
+}
+
+
+/* ---------- circuit demo ---------- */
+.flow{fill:none; stroke-dasharray:5 11; stroke-linecap:round; animation:flow .9s linear infinite}
+@keyframes flow{to{stroke-dashoffset:-16}}
+.demo{background:var(--panel); border:1px solid var(--line); border-radius:.75rem; padding:1.25rem}
+.demo svg{width:100%; height:auto; display:block}
+.tabs{display:flex; gap:.5rem; flex-wrap:wrap; margin-bottom:1rem}
+.tab{font:inherit; border:1px solid var(--line); background:var(--bg); color:var(--ink); padding:.4rem 1.2rem; border-radius:999px; cursor:pointer; transition:background .2s}
+.tab[aria-selected="true"]{background:var(--accent); color:var(--accent-ink); border-color:var(--accent)}
+.view{display:none}
+.view.on{display:block; animation:rise .5s both}
+.cap{margin:.75rem 0 0; color:var(--muted)}
+.use svg{width:5rem; height:3.5rem; display:block; margin-bottom:.6rem}
+.uses{display:grid; grid-template-columns:repeat(auto-fit,minmax(13rem,1fr)); gap:1rem}
+
+
+/* ---------- v3: electric, dark-first ---------- */
+@property --a{syntax:"<angle>"; inherits:false; initial-value:0deg}
+:root{--bg:#f2f5f9;--ink:#0b1626;--muted:#46576b;--panel:#fff;--line:#cdd7e2;--hole:#d3dbe5;--wire:#d97706;--accent:#0369a1;--accent-ink:#fff;--warn:#8a5a00;--warn-bg:#fff3d6}
+:root[data-theme="dark"]{--bg:#05080d;--ink:#e8f1fb;--muted:#8da1b7;--panel:#0b121b;--line:#1a2a3b;--hole:#15212e;--wire:#ffb627;--accent:#35e0ff;--accent-ink:#031017;--warn:#ffd27a;--warn-bg:#1b1508}
+body{transition:background .3s,color .3s}
+.board{background:none; overflow:hidden}
+.board::before{display:none}
+.board::after{content:""; position:absolute; inset:0; pointer-events:none;
+  background:radial-gradient(300px circle at var(--mx,75%) var(--my,35%), color-mix(in srgb,var(--accent) 18%,transparent), transparent 70%)}
+#fx{position:absolute; inset:0; width:100%; height:100%}
+.top{justify-content:space-between; align-items:center}
+.brand{display:flex; align-items:center; gap:.5rem; color:var(--muted); font-weight:500}
+.ctl{display:flex; gap:.5rem}
+.lang{border-radius:4px; background:transparent; min-width:2.4rem}
+.hero{padding:5rem 0 4.5rem}
+.wire{display:none}
+h1{font-size:clamp(3.4rem,11vw,6.5rem); letter-spacing:-.035em; text-shadow:0 0 30px color-mix(in srgb,var(--accent) 50%,transparent); animation:flick 7s infinite}
+:root[data-theme="light"] h1{text-shadow:none}
+@keyframes flick{0%,91%,100%{opacity:1}92%{opacity:.7}93%{opacity:1}95%{opacity:.55}96%{opacity:1}}
+.lead{font-size:1.15rem; max-width:36rem}
+.btn{position:relative; isolation:isolate; border-radius:4px; background:var(--wire); color:#140d00; padding:.95rem 2.2rem; animation:none;
+  box-shadow:0 0 28px color-mix(in srgb,var(--wire) 45%,transparent); transition:box-shadow .2s, transform .2s}
+.btn::before{content:""; position:absolute; inset:-2px; border-radius:6px; z-index:-1;
+  background:conic-gradient(from var(--a),transparent 60%,var(--accent) 88%,#fff); animation:spin 2.6s linear infinite}
+.btn::after{content:""; position:absolute; inset:0; border-radius:4px; background:var(--wire); z-index:-1}
+.btn:hover{filter:none; transform:translateY(-2px); box-shadow:0 0 46px color-mix(in srgb,var(--wire) 70%,transparent)}
+@keyframes spin{to{--a:360deg}}
+h2{font-size:1.4rem; font-weight:500; letter-spacing:-.01em; border-inline-start:3px solid var(--wire); padding-inline-start:.75rem}
+dl.spec,.demo,.note{border-radius:6px}
+.tab{border-radius:4px}
+.flow{stroke:#fff1b8; filter:drop-shadow(0 0 4px #ffb627)}
+ol.steps{border-color:var(--wire)}
+ol.steps li::before{background:var(--wire); color:#140d00; border-radius:4px}
+.note.warn{border-color:var(--warn)}
+:root[data-theme="dark"] .demo,:root[data-theme="dark"] .note,:root[data-theme="dark"] dl.spec{box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--accent) 6%,transparent)}
+
+/* ---------- v4: full-page electricity ---------- */
+#fx{position:fixed; inset:0; width:100%; height:100%; z-index:0; pointer-events:none}
+.board::after{display:none}
+body::before{content:""; position:fixed; inset:0; z-index:0; pointer-events:none;
+  background:radial-gradient(420px circle at var(--mx,70%) var(--my,30%), color-mix(in srgb,var(--accent) 16%,transparent), transparent 70%)}
+header,main,footer{position:relative; z-index:1}
+.demo,.note,dl.spec{background-color:color-mix(in srgb,var(--panel) 76%,transparent); -webkit-backdrop-filter:blur(6px); backdrop-filter:blur(6px)}
+.note{background-image:radial-gradient(220px circle at var(--gx,-99px) var(--gy,-99px), color-mix(in srgb,var(--accent) 14%,transparent), transparent)}
+footer{background:color-mix(in srgb,var(--bg) 70%,transparent); -webkit-backdrop-filter:blur(6px); backdrop-filter:blur(6px)}
+#pg{position:fixed; top:0; inset-inline-start:0; width:100%; height:3px; z-index:9; transform:scaleX(var(--p,0)); transform-origin:0 50%;
+  background:linear-gradient(90deg,var(--accent),var(--wire)); box-shadow:0 0 12px var(--accent)}
+html[dir="rtl"] #pg{transform-origin:100% 50%}
+.feats{display:grid; grid-template-columns:repeat(auto-fit,minmax(15rem,1fr)); gap:1rem; counter-reset:f}
+.feat{position:relative; overflow:hidden}
+.feat::before{counter-increment:f; content:"0" counter(f); display:block; margin-bottom:.35rem; font:700 .85rem ui-monospace,Consolas,monospace; color:var(--accent); letter-spacing:.12em}
+.feat::after{content:""; position:absolute; inset-inline:0; top:0; height:2px; background:linear-gradient(90deg,transparent,var(--accent),transparent); transform:translateX(-100%); animation:scan 3.6s linear infinite}
+.feat:nth-child(2n)::after{animation-delay:.9s}.feat:nth-child(3n)::after{animation-delay:1.8s}
+@keyframes scan{to{transform:translateX(100%)}}
+details.note{padding:0}
+details.note summary{cursor:pointer; list-style:none; padding:1rem 1.25rem; font-weight:700; display:flex; justify-content:space-between; gap:1rem}
+details.note summary::-webkit-details-marker{display:none}
+details.note summary::after{content:"+"; color:var(--wire); font-size:1.5rem; line-height:1; transition:transform .25s}
+details.note[open]{border-color:var(--accent)}
+details.note[open] summary::after{transform:rotate(45deg)}
+details.note p{padding:0 1.25rem 1.1rem}
+.final{text-align:center; padding:3.5rem 0 4rem}
+.final h2{border:0; padding:0; font-size:2.2rem; font-weight:700}
+.final p{color:var(--muted); margin:0 0 1.75rem}
+#fab{position:fixed; inset-inline-end:1rem; bottom:1rem; z-index:8; padding:.65rem 1.4rem; font-size:1rem; opacity:0; transform:translateY(20px); pointer-events:none; transition:opacity .3s, transform .3s}
+#fab.on{opacity:1; transform:none; pointer-events:auto}
+
+.ai{display:grid; gap:1rem}
+.ai label{display:grid; gap:.35rem; font-weight:500}
+.ai select,.ai textarea{font:inherit; color:var(--ink); background:var(--bg); border:1px solid var(--line); border-radius:4px; padding:.6rem .8rem; width:100%}
+.ai textarea{min-height:7rem; resize:vertical}
+.ai select:focus,.ai textarea:focus{border-color:var(--accent)}
+.chips,.acts{display:flex; gap:.55rem; flex-wrap:wrap}
+.chip{font:inherit; font-size:.9rem; color:var(--ink); background:transparent; border:1px dashed var(--line); border-radius:999px; padding:.25rem .9rem; cursor:pointer}
+.chip:hover{border-color:var(--accent); color:var(--accent)}
+.btn2{font:inherit; font-weight:700; cursor:pointer; border:1px solid var(--accent); color:var(--accent); background:transparent; border-radius:4px; padding:.6rem 1.3rem; transition:background .2s,color .2s}
+.btn2:hover{background:var(--accent); color:var(--accent-ink)}
+.btn2.main{background:var(--wire); border-color:var(--wire); color:#140d00}
+#aiOut{display:none; direction:ltr; text-align:left; margin:0; padding:1rem; background:var(--bg); border:1px solid var(--line); border-radius:6px; overflow:auto; max-height:26rem; font:.9rem/1.5 ui-monospace,Consolas,monospace; white-space:pre-wrap}
+#aiMsg{min-height:1.5rem; margin:0; color:var(--accent)}
+
+/* language switching */
+html[lang="ar"] .en, html[lang="en"] .ar{display:none !important}
 </style>
 </head>
 <body>
-<div class="app">
-  <header class="head">
-    <div>
-      <h1>محاكاة متتبع الشمس والبطارية</h1>
-      <p class="sub">اختار اليوم والساعة، والأحمال ومستواها، وعمق التفريغ، وتحكم الشبكة، ووضع التتبع. اللوح على عمود بسيرفوهين، والإشعاع بيوصل عمودي على اللوح بقدر ما التتبع دقيق. الرسم بيتحسب بخطوات 5 ثواني وبيتعرض بين الخطوات عشان الحركة تبقى سلسة.</p>
-    </div>
-    <div style="display:flex;gap:8px;flex-wrap:wrap">
-      <button type="button" id="btn-theme">الوضع: تلقائي</button>
-      <button type="button" id="btn-print">طباعة / PDF</button>
-    </div>
-  </header>
+<canvas id="fx" aria-hidden="true"></canvas>
+<div id="pg" aria-hidden="true"></div>
 
-  <section class="panel">
-    <h2>اليوم والساعة</h2>
-    <div class="row">
-      <div class="field" style="flex:0 1 auto">
-        <label>أيام جاهزة</label>
-        <div class="presets" id="presets">
-          <button type="button" data-d="172">21 يونيو</button>
-          <button type="button" data-d="304">31 أكتوبر</button>
-          <button type="button" data-d="12">12 يناير</button>
-        </div>
+<header class="board">
+  <div class="wrap">
+    <div class="top">
+      <span class="brand"><svg viewBox="0 0 32 32" width="20" height="20" aria-hidden="true"><path d="M18 2 6 18h8l-2 12 12-16h-8z" fill="var(--wire)"/></svg>Portable</span>
+      <div class="ctl">
+        <button class="lang" id="themeBtn" type="button" aria-label="Theme"></button>
+        <button class="lang" id="langBtn" type="button"><span class="ar">English</span><span class="en">العربية</span></button>
       </div>
-      <div class="field" style="flex:0 1 auto">
-        <label for="date">اختار اليوم</label>
-        <input id="date" type="date" value="2026-10-31">
+    </div>
+    <div class="hero">
+      <h1>Fritzing</h1>
+      <p class="lead">
+        <span class="ar">صمّم دوائرك الإلكترونية من الـ breadboard إلى الـ schematic ثم لوحة الـ PCB في برنامج واحد. نسخة محمولة لويندوز 64-bit، فك الضغط وشغّل بدون تثبيت.</span>
+        <span class="en">Design circuits from breadboard to schematic to PCB in one tool. A portable Windows 64-bit build: unzip and run, no installer.</span>
+      </p>
+      <div class="cta">
+                <a class="btn" id="dl" onclick="window.plausible&&plausible('Download')"
+           href="https://github.com/medoelzayat06a-ux/fritzing-download/releases/download/v1.0/Fritzing_Windows_x64.zip" rel="noopener">
+          <span class="ar">تحميل Fritzing</span><span class="en">Download Fritzing</span>
+        </a>
+        <small><span class="ar">ملف ZIP واحد فيه البرنامج وكل مكتباته</span><span class="en">One ZIP with the app and all its libraries</span></small>
       </div>
-      <div class="field" style="flex:0 1 auto">
-        <label for="tm">اختار الساعة</label>
-        <input id="tm" type="time" value="12:00" step="5">
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <section>
+    <h2><span class="ar">دائرة واحدة، ثلاث شاشات</span><span class="en">One circuit, three views</span></h2>
+    <div class="demo">
+      <div class="tabs" role="tablist">
+        <button class="tab" role="tab" aria-selected="true" type="button">Breadboard</button>
+        <button class="tab" role="tab" aria-selected="false" type="button">Schematic</button>
+        <button class="tab" role="tab" aria-selected="false" type="button">PCB</button>
       </div>
-      <div class="field">
-        <label for="cloud">الغيوم <span class="num" id="cloud-v"></span></label>
-        <input id="cloud" type="range" min="0" max="100" step="5">
+      <div class="view on" role="tabpanel">
+        <svg viewBox="0 0 400 220" role="img" aria-label="Breadboard"><defs><pattern id="h" width="14" height="14" patternUnits="userSpaceOnUse"><circle cx="7" cy="7" r="2" fill="var(--hole)"/></pattern></defs>
+<rect x="20" y="20" width="360" height="180" rx="8" fill="var(--bg)" stroke="var(--line)"/><rect x="20" y="20" width="360" height="180" rx="8" fill="url(#h)"/>
+<path d="M60 60 H340 V160 H60 Z" fill="none" stroke="#d6453d" stroke-width="6" stroke-linejoin="round"/><path class="flow" d="M60 60 H340 V160 H60 Z" stroke="#fff" stroke-width="3"/>
+<rect x="40" y="85" width="40" height="50" rx="4" fill="#2b3a46"/><text x="60" y="116" fill="#fff" font-size="13" text-anchor="middle">9V</text>
+<rect x="135" y="50" width="70" height="20" rx="10" fill="#e3c08a" stroke="#8a6a3a"/><path d="M155 50v20M168 50v20M181 50v20" stroke="#8a3b1f" stroke-width="4"/>
+<circle class="led" cx="340" cy="110" r="16" stroke="#8a1f1f" stroke-width="3"/></svg>
+        <p class="cap"><span class="ar">ركّب الدائرة زي ما هي على الـ breadboard: بطارية ومقاومة وLED وأسلاك.</span><span class="en">Wire it up like the real thing: battery, resistor, LED and jumper wires.</span></p>
       </div>
-      <div class="field">
-        <label for="peak">مستوى الإشعاع (ذروة) <span class="num" id="peak-v"></span></label>
-        <input id="peak" type="range" min="300" max="1100" step="25">
+      <div class="view" role="tabpanel">
+        <svg viewBox="0 0 400 220" role="img" aria-label="Schematic"><path d="M60 60 H140 M200 60 H340 V90 M340 130 V160 H60 V130 M60 90 V60" fill="none" stroke="var(--accent)" stroke-width="3" stroke-linejoin="round"/>
+<path class="flow" d="M60 60 H340 V160 H60 Z" stroke="var(--ink)" stroke-width="2.5"/>
+<rect x="132" y="48" width="76" height="24" fill="var(--panel)"/><path d="M130 60 h10 l5-12 10 24 10-24 10 24 10-24 5 12 h10" fill="none" stroke="var(--accent)" stroke-width="3"/>
+<rect x="320" y="86" width="40" height="48" fill="var(--panel)"/><path d="M326 94h28l-14 24zM326 120h28M354 100l12-8M356 108l12-8" fill="none" stroke="var(--accent)" stroke-width="3"/>
+<rect x="44" y="86" width="32" height="48" fill="var(--panel)"/><path d="M46 96h28M54 112h12" stroke="var(--accent)" stroke-width="3"/>
+<circle class="led" cx="340" cy="150" r="0"/></svg>
+        <p class="cap"><span class="ar">نفس الدائرة كرسم تخطيطي بالرموز القياسية.</span><span class="en">The same circuit as a standard schematic.</span></p>
       </div>
-      <div class="field">
-        <label for="panelW">قدرة اللوح الاسمية <span class="num" id="panelW-v"></span></label>
-        <input id="panelW" type="range" min="5" max="100" step="1">
+      <div class="view" role="tabpanel">
+        <svg viewBox="0 0 400 220" role="img" aria-label="PCB"><rect x="20" y="20" width="360" height="180" rx="10" fill="#1f6b47"/>
+<path d="M60 60 H340 V160 H60 Z" fill="none" stroke="#d9a441" stroke-width="8" stroke-linejoin="round"/><path class="flow" d="M60 60 H340 V160 H60 Z" stroke="#fff3c4" stroke-width="3"/>
+<g fill="#d9a441" stroke="#1f6b47" stroke-width="3"><circle cx="60" cy="90" r="9"/><circle cx="60" cy="130" r="9"/><circle cx="140" cy="60" r="9"/><circle cx="200" cy="60" r="9"/><circle class="led" cx="340" cy="90" r="9"/><circle cx="340" cy="130" r="9"/></g>
+<g fill="#10281c"><circle cx="60" cy="90" r="3"/><circle cx="60" cy="130" r="3"/><circle cx="140" cy="60" r="3"/><circle cx="200" cy="60" r="3"/><circle cx="340" cy="90" r="3"/><circle cx="340" cy="130" r="3"/></g>
+<g fill="#fff" font-size="11"><text x="150" y="86">R1</text><text x="285" y="114">LED1</text><text x="76" y="114">BAT</text></g></svg>
+        <p class="cap"><span class="ar">وحوّلها للوحة PCB جاهزة للتصنيع بنفس التوصيلات.</span><span class="en">Turn it into a PCB ready for manufacturing, with the same connections.</span></p>
       </div>
     </div>
   </section>
 
-  <section class="panel">
-    <h2>الأحمال والبطارية والشبكة</h2>
-    <div class="row">
-      <div class="field">
-        <label for="loadMult">مستوى الأحمال (مضاعف) <span class="num" id="loadMult-v"></span></label>
-        <input id="loadMult" type="range" min="0.25" max="2" step="0.05">
-      </div>
-      <div class="field" style="flex:0 1 auto">
-        <label for="dod">عمق التفريغ المسموح</label>
-        <select id="dod">
-          <option value="50">50 %</option><option value="70">70 %</option><option value="80">80 %</option><option value="90">90 %</option>
-        </select>
-      </div>
-      <div class="field">
-        <label for="socStart">شحنة البطارية عند 00:00 <span class="num" id="socStart-v"></span></label>
-        <input id="socStart" type="range" min="0" max="100" step="1">
-      </div>
-      <div class="field" style="flex:0 1 auto">
-        <label for="gridMode">التغذية من الشبكة</label>
-        <select id="gridMode">
-          <option value="auto">تلقائي</option><option value="on">مفتوحة دائماً</option><option value="off">مقفولة دائماً</option>
-        </select>
-      </div>
-      <div class="field">
-        <label for="gridThr">عتبة تشغيل الشبكة (SOC) <span class="num" id="gridThr-v"></span></label>
-        <input id="gridThr" type="range" min="15" max="50" step="1">
-      </div>
-      <div class="field">
-        <label for="shedThr">عتبة فصل الأحمال غير الأساسية <span class="num" id="shedThr-v"></span></label>
-        <input id="shedThr" type="range" min="5" max="30" step="1">
-      </div>
+  <section>
+    <h2><span class="ar">مميزات البرنامج</span><span class="en">What's inside</span></h2>
+    <div class="feats">
+      <div class="note feat"><h3><span class="ar">مكتبة قطع ضخمة</span><span class="en">Huge parts library</span></h3><p><span class="ar">آلاف القطع الجاهزة: Arduino وحساسات ومقاومات وLEDs ودوائر متكاملة.</span><span class="en">Thousands of ready parts: Arduino boards, sensors, resistors, LEDs and ICs.</span></p></div>
+      <div class="note feat"><h3><span class="ar">شاشات مترابطة</span><span class="en">Linked views</span></h3><p><span class="ar">أي تعديل في الـ Breadboard بيظهر تلقائيًا في الـ Schematic والـ PCB.</span><span class="en">Edit in Breadboard and it shows up in Schematic and PCB automatically.</span></p></div>
+      <div class="note feat"><h3><span class="ar">تصدير للتصنيع</span><span class="en">Export for fabrication</span></h3><p><span class="ar">صدّر ملفات Gerber جاهزة لإرسالها لمصانع لوحات الـ PCB.</span><span class="en">Export Gerber files ready to send to a PCB manufacturer.</span></p></div>
+      <div class="note feat"><h3><span class="ar">محرر كود</span><span class="en">Code editor</span></h3><p><span class="ar">اكتب وعدّل كود Arduino جنب الدائرة. الرفع الأسهل من Arduino IDE.</span><span class="en">Write Arduino code next to your circuit. Uploading is easiest from Arduino IDE.</span></p></div>
+      <div class="note feat"><h3><span class="ar">أمثلة جاهزة</span><span class="en">Built-in examples</span></h3><p><span class="ar">افتح مشاريع جاهزة من قائمة Examples وتعلّم منها خطوة خطوة.</span><span class="en">Open ready projects from the Examples menu and learn from them step by step.</span></p></div>
+      <div class="note feat"><h3><span class="ar">محرر القطع</span><span class="en">Parts editor</span></h3><p><span class="ar">اعمل قطعة جديدة بشكلها ورجولها لو مش موجودة في المكتبة.</span><span class="en">Create a custom part with its own look and pins if the library lacks it.</span></p></div>
     </div>
-    <div style="overflow-x:auto;margin-top:12px">
-      <table class="loadtbl" id="loadtbl"></table>
-    </div>
-    <p class="note" id="floor-note" style="margin:8px 0 0"></p>
   </section>
 
-  <section class="panel">
-    <h2>التتبع</h2>
-    <div class="row">
-      <div class="field" style="flex:0 1 auto">
-        <label for="trackMode">وضع التتبع</label>
-        <select id="trackMode">
-          <option value="ldr">LDR (حلقة التحكم)</option>
-          <option value="astro">فلكي (حسب الوقت والموقع)</option>
-          <option value="ideal">مثالي (سقف)</option>
-        </select>
+  <section>
+    <h2><span class="ar">مساعد الكود بالذكاء الاصطناعي</span><span class="en">AI code helper</span></h2>
+    <div class="demo ai">
+      <p class="cap" style="margin:0"><span class="ar">اوصف دائرتك واختار اللوح، وهيطلعلك كود جاهز مع جدول التوصيلات والمكتبات.</span><span class="en">Describe your circuit and pick a board to get ready code, a wiring table and the libraries you need.</span></p>
+      <label><span class="ar">اللوح</span><span class="en">Board</span><select id="aiBoard"><option>Arduino Uno</option><option>Arduino Nano</option><option>Arduino Mega 2560</option><option>ESP32</option><option>ESP8266 (NodeMCU)</option><option>Raspberry Pi Pico</option></select></label>
+      <label><span class="ar">عاوز الكود يعمل إيه؟</span><span class="en">What should the code do?</span><textarea id="aiQ" data-ar="مثال: عندي LED على الطرف 8 وزرار على الطرف 2، عاوز الـ LED يفتح لما أدوس الزرار." data-en="Example: I have an LED on pin 8 and a button on pin 2. I want the LED to turn on while I press the button."></textarea></label>
+      <div class="chips"><button class="chip" type="button"><span class="ar">LED يرمش كل ثانية</span><span class="en">Blink an LED every second</span></button><button class="chip" type="button"><span class="ar">زرار يشغّل ويطفّي LED</span><span class="en">A button that toggles an LED</span></button><button class="chip" type="button"><span class="ar">قراءة حساس حرارة DHT11 على Serial</span><span class="en">Read a DHT11 sensor to Serial</span></button><button class="chip" type="button"><span class="ar">سيرفو موتور يتحرك بمقاومة متغيرة</span><span class="en">Servo controlled by a potentiometer</span></button><button class="chip" type="button"><span class="ar">حساس مسافة HC-SR04 مع بازر</span><span class="en">HC-SR04 distance sensor with a buzzer</span></button></div>
+      <div class="acts">
+        <button class="btn2 main" id="aiGen" type="button" hidden><span class="ar">ولّد الكود هنا</span><span class="en">Generate here</span></button>
+        <button class="btn2" id="aiClaude" type="button"><span class="ar">اسأل Claude</span><span class="en">Ask Claude</span></button>
+        <button class="btn2" id="aiGpt" type="button">ChatGPT</button>
+        <button class="btn2" id="aiCopy" type="button"><span class="ar">انسخ الطلب</span><span class="en">Copy prompt</span></button>
       </div>
-      <div class="field">
-        <label for="wind">سرعة الرياح (م/ث) <span class="num" id="wind-v"></span></label>
-        <input id="wind" type="range" min="0" max="20" step="0.5">
+      <p id="aiMsg" role="status"></p>
+      <pre id="aiOut"></pre>
+      <p class="cap" style="margin:0"><span class="ar">الذكاء الاصطناعي ممكن يغلط: راجع التوصيلات وجهد القطع قبل ما توصّل الكهربا.</span><span class="en">AI can make mistakes: check the wiring and part voltages before powering anything.</span></p>
+    </div>
+  </section>
+
+  <section>
+    <h2><span class="ar">تستخدمه في إيه</span><span class="en">What you can do with it</span></h2>
+    <div class="uses">
+      <div class="note use">
+        <svg viewBox="0 0 80 56" aria-hidden="true"><rect x="6" y="6" width="68" height="44" rx="5" fill="var(--bg)" stroke="var(--line)"/><path class="flow" d="M12 28H30M50 28H68" stroke="var(--wire)" stroke-width="3"/><circle class="led" cx="40" cy="28" r="8" stroke="var(--ink)" stroke-width="2"/></svg>
+        <h3><span class="ar">تجارب سريعة</span><span class="en">Quick prototypes</span></h3>
+        <p><span class="ar">جرّب فكرتك على breadboard افتراضي قبل ما تشتري قطعة.</span><span class="en">Try an idea on a virtual breadboard before buying a single part.</span></p>
       </div>
-      <div class="field">
-        <label for="slew">أقصى سرعة السيرفو (°/دقيقة) <span class="num" id="slew-v"></span></label>
-        <input id="slew" type="range" min="5" max="180" step="5">
+      <div class="note use">
+        <svg viewBox="0 0 80 56" aria-hidden="true"><path d="M4 28H20l4-12 8 24 8-24 8 24 4-12H76" fill="none" stroke="var(--accent)" stroke-width="3" stroke-linejoin="round"/><path class="flow" d="M4 28H20l4-12 8 24 8-24 8 24 4-12H76" stroke="var(--panel)" stroke-width="3"/></svg>
+        <h3><span class="ar">رسومات تخطيطية</span><span class="en">Schematics</span></h3>
+        <p><span class="ar">وثّق مشروعك برسم واضح تقدر تشاركه أو تضيفه في التقرير.</span><span class="en">Document your project with a clear drawing you can share or put in a report.</span></p>
       </div>
-      <div class="field">
-        <label for="db">المنطقة الميتة (°) <span class="num" id="db-v"></span></label>
-        <input id="db" type="range" min="0" max="5" step="0.1">
+      <div class="note use">
+        <svg viewBox="0 0 80 56" aria-hidden="true"><rect x="2" y="4" width="76" height="48" rx="6" fill="#1f6b47"/><path class="flow" d="M6 16H26M6 40H26M54 16H74M54 40H74" stroke="#fff3c4" stroke-width="3"/><path d="M6 16H26M6 40H26M54 16H74M54 40H74" stroke="#d9a441" stroke-width="3" opacity=".6"/><rect x="26" y="10" width="28" height="36" rx="3" fill="#1b1b1b"/></svg>
+        <h3><span class="ar">تصميم لوحات PCB</span><span class="en">PCB design</span></h3>
+        <p><span class="ar">حوّل الدائرة للوحة مطبوعة وصدّرها للتصنيع.</span><span class="en">Turn the circuit into a printed board and export it for manufacturing.</span></p>
       </div>
-      <div class="field">
-        <label for="gain">قوة التصحيح <span class="num" id="gain-v"></span></label>
-        <input id="gain" type="range" min="0.05" max="0.6" step="0.05">
-      </div>
-      <div class="field">
-        <label for="delta">زاوية حساسات LDR <span class="num" id="delta-v"></span></label>
-        <input id="delta" type="range" min="5" max="40" step="1">
-      </div>
-      <div class="field">
-        <label for="wear">وزن تآكل البطارية <span class="num" id="wear-v"></span></label>
-        <input id="wear" type="range" min="0" max="3" step="0.1">
+      <div class="note use">
+        <svg viewBox="0 0 80 56" aria-hidden="true"><rect x="6" y="10" width="68" height="36" rx="4" fill="#0b7a85"/><rect x="30" y="20" width="22" height="16" rx="2" fill="#1b1b1b"/><g fill="#d9a441"><rect x="12" y="6" width="3" height="5"/><rect x="20" y="6" width="3" height="5"/><rect x="28" y="6" width="3" height="5"/><rect x="36" y="6" width="3" height="5"/></g><circle class="led" cx="62" cy="22" r="4"/></svg>
+        <h3><span class="ar">Arduino والتعلّم</span><span class="en">Arduino and learning</span></h3>
+        <p><span class="ar">مناسب للطلبة والمشاريع: صمّم دائرة Arduino وافهم التوصيلات بالشكل.</span><span class="en">Great for students and projects: design an Arduino circuit and see how it connects.</span></p>
       </div>
     </div>
   </section>
 
-  <section class="panel">
-    <div class="views">
-      <div>
-        <h2>اللوح على العمود (3D)</h2>
-        <svg id="scene" viewBox="0 0 460 340" role="img" aria-label="منظر ثلاثي للوح على عمود"></svg>
+  
+  <section>
+    <dl class="spec">
+      <div><dt><span class="ar">النظام</span><span class="en">Platform</span></dt><dd>Windows 10/11 x64</dd></div>
+      <div><dt><span class="ar">الصيغة</span><span class="en">Format</span></dt><dd><span class="ar">ZIP (محمول)</span><span class="en">ZIP (portable)</span></dd></div>
+      <div><dt><span class="ar">الترخيص</span><span class="en">License</span></dt><dd>GPL-3.0</dd></div>
+    </dl>
+  </section>
+
+  <section>
+    <h2><span class="ar">خطوات التشغيل</span><span class="en">Getting started</span></h2>
+    <ol class="steps">
+      <li>
+        <h3><span class="ar">نزّل الملف</span><span class="en">Download</span></h3>
+        <p><span class="ar">اضغط زر التحميل بالأعلى لتحميل الملف المضغوط.</span><span class="en">Use the button above to get the ZIP archive.</span></p>
+      </li>
+      <li>
+        <h3><span class="ar">فك الضغط</span><span class="en">Extract</span></h3>
+        <p><span class="ar">كليك يمين على الملف، ثم <b>Extract All</b>، وفكّه في مكان مثل <code>C:\Fritzing</code>.</span><span class="en">Right-click the file, choose <b>Extract All</b>, and extract it somewhere like <code>C:\Fritzing</code>.</span></p>
+      </li>
+      <li>
+        <h3><span class="ar">شغّل البرنامج</span><span class="en">Run</span></h3>
+        <p><span class="ar">افتح المجلد وشغّل <code>Fritzing.exe</code>.</span><span class="en">Open the folder and launch <code>Fritzing.exe</code>.</span></p>
+      </li>
+    </ol>
+  </section>
+
+  <section id="verify">
+    <h2><span class="ar">افحص الملف بنفسك</span><span class="en">Check the file yourself</span></h2>
+    <div class="notes">
+      <div class="note">
+        <h3><span class="ar">1) فحص الفيروسات على VirusTotal</span><span class="en">1) Scan for viruses on VirusTotal</span></h3>
+        <p><span class="ar">بعد ما تنزّل الملف، ارفعه على VirusTotal وهو هيفحصه بعشرات برامج الحماية ويديك النتيجة. الفحص بتعمله إنت بنفسك، مش بكلامنا.</span><span class="en">After downloading, upload the file to VirusTotal. It scans it with dozens of antivirus engines and shows you the result. You run the check yourself.</span></p>
+        <p style="margin-top:.75rem"><a class="btn2 main" id="vtUpload" href="https://www.virustotal.com/gui/home/upload" target="_blank" rel="noopener" style="display:inline-block;text-decoration:none"><span class="ar">افتح VirusTotal</span><span class="en">Open VirusTotal</span></a></p>
       </div>
-      <div>
-        <h2>الاتجاه من أعلى</h2>
-        <svg id="compass" viewBox="0 0 240 240" role="img" aria-label="اتجاه اللوح مقابل الشمس"></svg>
-        <div class="kv" id="readout" style="margin-top:6px"></div>
-        <div class="badges" id="badges"></div>
+    </div>
+  </section>
+
+  <section>
+    <h2><span class="ar">ملاحظات مهمة</span><span class="en">Good to know</span></h2>
+    <div class="notes">
+      <div class="note warn">
+        <h3><span class="ar">تحذير SmartScreen</span><span class="en">SmartScreen warning</span></h3>
+        <p><span class="ar">لو ظهر تحذير من Windows SmartScreen، اختار <b>More info</b> ثم <b>Run anyway</b>.</span><span class="en">If Windows SmartScreen shows a warning, choose <b>More info</b>, then <b>Run anyway</b>.</span></p>
+      </div>
+      <div class="note">
+        <h3><span class="ar">المحاكاة غير مدعومة</span><span class="en">No simulator</span></h3>
+        <p><span class="ar">ميزة المحاكاة (Simulate) غير مدعومة في هذه النسخة.</span><span class="en">The Simulate feature is not supported in this build.</span></p>
+      </div>
+      <div class="note">
+        <h3><span class="ar">الرفع على Arduino</span><span class="en">Uploading to Arduino</span></h3>
+        <p><span class="ar">رفع الكود على Arduino يحتاج أدوات إضافية حسب نوع الكارت، والأسهل استخدام Arduino IDE.</span><span class="en">Uploading code to an Arduino needs extra tools depending on the board. Arduino IDE is the easiest route.</span></p>
+      </div>
+      <div class="note">
+        <h3><span class="ar">لا تحذف أي ملف</span><span class="en">Keep every file</span></h3>
+        <p><span class="ar">المكتبات الداخلية موجودة داخل المجلد، فلا تحذف أي ملف منه.</span><span class="en">The bundled libraries live inside the folder, so don't delete anything from it.</span></p>
       </div>
     </div>
-    <div class="scrub">
-      <button type="button" id="btn-play">تشغيل ▶</button>
-      <select id="speed" aria-label="سرعة التشغيل">
-        <option value="10">10 دقيقة/ثانية</option>
-        <option value="30" selected>30 دقيقة/ثانية</option>
-        <option value="90">90 دقيقة/ثانية</option>
-      </select>
-      <input id="scrub" type="range" min="0" max="17279" step="1" value="0" aria-label="وقت اليوم">
-      <span class="num" id="scrub-t" style="font-size:16px">00:00:00</span>
+  </section>
+
+  <section>
+    <h2><span class="ar">أسئلة شائعة</span><span class="en">FAQ</span></h2>
+    <div class="notes">
+      <details class="note"><summary><span class="ar">هل أحتاج أثبّت البرنامج؟</span><span class="en">Do I need to install it?</span></summary><p><span class="ar">لا. النسخة محمولة: فك الضغط وشغّل Fritzing.exe مباشرة.</span><span class="en">No. It is portable: extract and run Fritzing.exe directly.</span></p></details>
+      <details class="note"><summary><span class="ar">ليه SmartScreen بيحذّرني؟</span><span class="en">Why does SmartScreen warn me?</span></summary><p><span class="ar">لأن الملف غير موقّع رقميًا ومش معروف لدى ويندوز. اختار More info ثم Run anyway.</span><span class="en">Because the file is not digitally signed and not yet known to Windows. Choose More info, then Run anyway.</span></p></details>
+      <details class="note"><summary><span class="ar">أقدر أشغّله من فلاشة؟</span><span class="en">Can I run it from a USB drive?</span></summary><p><span class="ar">غالبًا أيوه لأنها نسخة محمولة، بشرط تنسخ المجلد كامل. لو حسيت ببطء انسخه على الهارد.</span><span class="en">Most likely yes since it is portable, as long as you copy the whole folder. If it feels slow, copy it to your hard drive.</span></p></details>
+      <details class="note"><summary><span class="ar">البرنامج مش بيفتح، أعمل إيه؟</span><span class="en">It will not open. What now?</span></summary><p><span class="ar">تأكد إنك فكيت الضغط بالكامل (مش من جوه الـ ZIP) وإن ويندوزك 64-bit.</span><span class="en">Make sure you fully extracted the ZIP (not run from inside it) and that your Windows is 64-bit.</span></p></details>
+      <details class="note"><summary><span class="ar">البرنامج مجاني؟</span><span class="en">Is it free?</span></summary><p><span class="ar">Fritzing مفتوح المصدر بترخيص GPL، والكود الكامل متاح على GitHub.</span><span class="en">Fritzing is open source under the GPL, and the full source is on GitHub.</span></p></details>
     </div>
   </section>
 
-  <section class="panel">
-    <h2>القدرة المولدة وشحن البطارية</h2>
-    <div class="legend">
-      <span><i style="background:var(--c-fix)"></i>تركيب ثابت</span>
-      <span><i style="background:var(--c-trk)"></i>متتبع (الوضع المختار)</span>
-      <span><i style="background:var(--c-ideal);border-top:2px dashed var(--c-ideal);height:0"></i>مثالي</span>
-    </div>
-    <svg id="chartPV" viewBox="0 0 1000 200" role="img" aria-label="قدرة اللوح على مدار اليوم"></svg>
-    <h2 style="margin-top:14px">شحنة البطارية SOC على مدار اليوم (%)</h2>
-    <svg id="chartSOC" viewBox="0 0 1000 200" role="img" aria-label="شحنة البطارية على مدار اليوم"></svg>
-    <h2 style="margin-top:14px">جهد البطارية (V)</h2>
-    <svg id="chartV" viewBox="0 0 1000 200" role="img" aria-label="جهد البطارية"></svg>
-    <h2 style="margin-top:14px">تيار البطارية (A): موجب شحن وسالب تفريغ، والمتقطع تيار الحمل</h2>
-    <svg id="chartI" viewBox="0 0 1000 200" role="img" aria-label="تيار البطارية والحمل"></svg>
-    <div style="overflow-x:auto;margin-top:12px"><table id="cmp"></table></div>
-    <div class="verdict" id="verdict"></div>
+  <section>
+    <h2><span class="ar">الكود المصدري</span><span class="en">Source code</span></h2>
+    <p>
+      <span class="ar">Fritzing برنامج مفتوح المصدر ومرخّص بموجب GPL. الكود الكامل متاح على GitHub:</span>
+      <span class="en">Fritzing is open-source software licensed under the GPL. The full source is on GitHub:</span>
+      <a href="https://github.com/fritzing/fritzing-app" dir="ltr">github.com/fritzing/fritzing-app</a>
+    </p>
   </section>
-
-  <section class="panel">
-    <h2>التحسين التلقائي والذكاء الاصطناعي</h2>
-    <div class="row">
-      <button type="button" id="btn-opt">حسّن النظام تلقائياً</button>
-      <button type="button" id="btn-undo" disabled>رجوع للإعداد السابق</button>
-    </div>
-    <p class="note" id="opt-msg"></p>
-    <div style="overflow-x:auto"><table id="opt-tbl"></table></div>
-    <div class="row" style="margin-top:12px">
-      <div class="field"><label for="ai-url">رابط نموذج الذكاء الاصطناعي (اختياري)</label><input id="ai-url" type="text" placeholder="https://your-server/optimize" style="width:100%"></div>
-      <button type="button" id="btn-ai">اسأل النموذج</button>
-    </div>
-    <p class="note" id="ai-msg"></p>
-    <div class="field"><label for="ai-token">مفتاح التطبيق (اللي حطيته في السيرفر)</label><input id="ai-token" type="password" style="width:100%"></div>
-    <p class="note">التحسين هنا بحث شبكي على القيم (مش تعلم آلي): بيجرّب 27 إعداد ويختار الأعلى في الطاقة المخدومة مع عقوبة للفيوز والقطع. لو وصلت رابط، بيتبعت ملخص اليوم والإعدادات للنموذج، والنموذج يرجّع JSON فيه gridThr وshedThr وdod (واختياري trackMode وnote).</p>
+  <section class="final">
+    <h2><span class="ar">جاهز تبدأ؟</span><span class="en">Ready to start?</span></h2>
+    <p><span class="ar">نزّل الملف، فكّه، وابدأ أول دائرة في دقايق.</span><span class="en">Download, extract and wire your first circuit in minutes.</span></p>
+    <a class="btn dl2 plausible-event-name=Download" href="#"><span class="ar">تحميل Fritzing</span><span class="en">Download Fritzing</span></a>
   </section>
+</main>
 
-  <section class="panel">
-    <h2>سجل الأيام المحفوظة</h2>
-    <div class="row">
-      <button type="button" id="btn-save">احفظ اليوم الحالي</button>
-      <button type="button" id="btn-export">تصدير كل الأيام (JSON)</button>
-    </div>
-    <div id="days" class="log" style="margin-top:10px"></div>
-    <p class="note">الحفظ على الجهاز نفسه، وكل يوم بيحفظ المنحنيات بالدقيقة (الإنتاج والجهد والتيار والـ SOC). حوالي 80 يوم بيتسع في المتصفح، ولو امتلأ احذف أيام قديمة.</p>
-  </section>
+<footer>
+  <div class="wrap">
+    <span class="ar">هذه الصفحة للتوزيع الشخصي. جميع حقوق البرنامج محفوظة لأصحابها ومرخصة بموجب GPL.</span>
+    <span class="en">This page is for personal distribution. All rights to the software belong to its owners and it is licensed under the GPL.</span>
+  </div>
+</footer>
 
-  <div class="foot">تقديري: الفلك والهندسة دقيقين، والإشعاع والبطارية نموذج مبسط (منحنى جهد خطي، MPPT بكفاءة 93 %). للفهم والتصميم، مش قياس دقيق.</div>
-</div>
+<a class="btn dl2 plausible-event-name=Download" id="fab" href="#"><span class="ar">تحميل</span><span class="en">Download</span></a>
 
 <script>
-(function () {
-  var D2R = Math.PI / 180, R2D = 180 / Math.PI;
-  var N = 1440, SUB = 12, M = N * SUB;            /* 12 خطوة في الدقيقة = 5 ثواني */
-  var DT_S = 5, DT_H = DT_S / 3600, DT_MIN = DT_S / 60;
-  var LAT = 30.6, LON = 31.0, PANEL_EFF = 0.85;
-  var PARK_TILT = 5, DAY_MIN_EL = 3, LIGHT_MIN = 30, WIND_STOW = 12, WIND_RESUME = 9, STOW_TILT = 5;
-  var CAP = 7, FUSE_A = 5, FUSE_RESET_STEPS = 15 * 60 / DT_S, CHG_EFF = 0.93, CHG_MAX = 3;
-  var LOAD_KEYS = ['lamp', 'phone', 'laptop', 'extra'];
-  var LOAD_DEF = {
-    lamp:   { name: 'مصباح طوارئ', W: 4,  eff: 1,    on: true,  ess: true,  s: 18, e: 6 },
-    phone:  { name: 'شحن موبايل (USB)', W: 5, eff: 0.85, on: true, ess: false, s: 19, e: 20 },
-    laptop: { name: 'شحن لاب', W: 45, eff: 0.9,  on: false, ess: false, s: 13, e: 14 },
-    extra:  { name: 'حمل إضافي (مروحة مثلاً)', W: 12, eff: 0.9, on: false, ess: false, s: 10, e: 12 }
-  };
+(function(){
+  var root=document.documentElement, reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  root.classList.add('js');
+  function store(k,v){try{localStorage.setItem(k,v)}catch(e){}}
+  function load(k){try{return localStorage.getItem(k)}catch(e){return null}}
 
-  var P = {
-    day: 304, cloud: 5, peak: 1000, panelW: 20, loadMult: 1, socStart: 62, dod: 70,
-    loads: JSON.parse(JSON.stringify(LOAD_DEF)),
-    gridMode: 'auto', gridThr: 30, shedThr: 10,
-    trackMode: 'ldr', wind: 4, slew: 60, db: 0.8, gain: 0.35, delta: 20, wear: 1, seed: 11
-  };
-  var PRESET_SEEDS = { 172: 3, 304: 11, 12: 19 };
+  // theme (dark by default)
+  var tb=document.getElementById('themeBtn');
+  function theme(t){root.setAttribute('data-theme',t); tb.textContent=t==='dark'?'☀':'☾'; store('theme',t); if(window.fxColors) fxColors();}
+  theme(load('theme')==='light'?'light':'dark');
+  tb.addEventListener('click',function(){theme(root.getAttribute('data-theme')==='dark'?'light':'dark')});
 
-  var TF = 0, T = 0, playing = false, speed = 30, lastFrame = 0;
-  var R = null, O = null;
+  // language
+  function lang(l){root.lang=l; root.dir=l==='ar'?'rtl':'ltr'; document.title=l==='ar'?'Fritzing — نسخة جاهزة لويندوز':'Fritzing — Ready-to-run build for Windows'; store('lang',l);}
+  var sl=load('lang'); if(sl==='en'||sl==='ar') lang(sl);
+  document.getElementById('langBtn').addEventListener('click',function(){lang(root.lang==='ar'?'en':'ar')});
 
-  var $ = function (s) { return document.querySelector(s); };
-  function pad(n) { return (n < 10 ? '0' : '') + n; }
-  function hhmmss(i) { var s = Math.floor(i * DT_S); return pad(Math.floor(s / 3600)) + ':' + pad(Math.floor(s / 60) % 60) + ':' + pad(s % 60); }
-  function mulberry32(a) {
-    return function () {
-      a |= 0; a = a + 0x6D2B79F5 | 0;
-      var t = Math.imul(a ^ a >>> 15, 1 | a);
-      t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
-      return ((t ^ t >>> 14) >>> 0) / 4294967296;
-    };
-  }
-  function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
-  function clampSym(v, l) { return clamp(v, -l, l); }
-  function wrapPi(a) { return ((a + Math.PI) % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI) - Math.PI; }
-  function hourIn(h, s, e) {
-    if (s === e) return false;
-    return s < e ? (h >= s && h < e) : (h >= s || h < e);
-  }
-  function dayFromDate(str) { var d = Date.parse(str + 'T00:00:00Z'), s = Date.UTC(2026, 0, 1); return Math.round((d - s) / 86400000) + 1; }
-  function dateFromDay(d) { return new Date(Date.UTC(2026, 0, d)).toISOString().slice(0, 10); }
-  function dayName(d) { return new Date(Date.UTC(2026, 0, d)).toLocaleDateString('ar-EG', { day: 'numeric', month: 'long', timeZone: 'UTC' }); }
+  // circuit view tabs
+  var tabs=document.querySelectorAll('.tab'), views=document.querySelectorAll('.view'), cur=0, timer;
+  function show(i){cur=i; tabs.forEach(function(t,j){t.setAttribute('aria-selected',j===i)}); views.forEach(function(v,j){v.classList.toggle('on',j===i)});}
+  tabs.forEach(function(t,i){t.addEventListener('click',function(){clearInterval(timer); show(i);})});
+  if(!reduce) timer=setInterval(function(){show((cur+1)%3)},5000);
 
-  /* ================= هندسة الشمس ================= */
-  function sunPos(day, clockH) {
-    var B = 360 / 365 * (day - 81) * D2R;
-    var eot = 9.87 * Math.sin(2 * B) - 7.53 * Math.cos(B) - 1.5 * Math.sin(B);
-    var solar = clockH + (4 * (LON - 30) + eot) / 60;
-    var H = (solar - 12) * 15 * D2R;
-    var dec = 23.45 * D2R * Math.sin(360 / 365 * (284 + day) * D2R);
-    var phi = LAT * D2R;
-    var el = Math.asin(Math.sin(phi) * Math.sin(dec) + Math.cos(phi) * Math.cos(dec) * Math.cos(H));
-    var azS = Math.atan2(Math.sin(H), Math.cos(H) * Math.sin(phi) - Math.tan(dec) * Math.cos(phi));
-    var az = ((azS + Math.PI) % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI);
-    return { el: el, az: az };
-  }
-  function sunVec(sp) { var c = Math.cos(sp.el); return [c * Math.sin(sp.az), c * Math.cos(sp.az), Math.sin(sp.el)]; }
-  function nrm(g, b) { return [Math.sin(b) * Math.sin(g), Math.sin(b) * Math.cos(g), Math.cos(b)]; }
-  function tAz(g) { return [Math.cos(g), -Math.sin(g), 0]; }
-  function tTi(g, b) { return [Math.cos(b) * Math.sin(g), Math.cos(b) * Math.cos(g), -Math.sin(b)]; }
-  function dot(a, b) { return a[0] * b[0] + a[1] * b[1] + a[2] * b[2]; }
-  function comb(n, t, c, s) { return [n[0] * c + t[0] * s, n[1] * c + t[1] * s, n[2] * c + t[2] * s]; }
+  // reveal on scroll
+  var items=document.querySelectorAll('section h2, dl.spec, ol.steps li, .note, section > p');
+  items.forEach(function(el,i){el.classList.add('reveal'); el.style.transitionDelay=(Math.min(Array.prototype.indexOf.call(el.parentNode.children,el),4)*90)+'ms';});
+  if('IntersectionObserver' in window){
+    var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){var t=e.target; t.classList.add('in'); io.unobserve(t); setTimeout(function(){t.style.transitionDelay='0ms'},1000);}})},{threshold:.15});
+    items.forEach(function(el){io.observe(el)});
+  } else items.forEach(function(el){el.classList.add('in')});
 
-  /* ================= المحاكاة ================= */
-  function newSrc(soc0) {
-    var F = function () { return new Float32Array(M); };
-    return { soc: soc0, gridOn: false, nonShed: false, cut: false, blownLeft: 0, trips: 0, shedSteps: 0, cutSteps: 0,
-      eCharge: 0, ePV: 0, eGrid: 0, eBat: 0, eLoad: 0, socA: F(), pvA: F(), gridA: F(), batA: F(), vbA: F(), ibA: F(), ilA: F() };
-  }
-
-  function simulate(p) {
-    var rnd = mulberry32(p.seed);
-    var cloudF = new Float32Array(N).fill(1 - p.cloud / 100 * 0.35);
-    var pEv = p.cloud / 100 * 0.015, t = 0;
-    while (t < N) {
-      if (rnd() < pEv) {
-        var len = 8 + Math.floor(rnd() * 25), depth = 0.3 + rnd() * 0.6;
-        for (var k = t; k < Math.min(N, t + len); k++) cloudF[k] = Math.min(cloudF[k], 1 - depth);
-        t += len;
-      } else t++;
-    }
-
-    var F = function () { return new Float32Array(M); };
-    var out = {
-      el: F(), az: F(), gT: F(), bT: F(), eA: F(), eB: F(), errT: F(), errE: F(), spd: F(),
-      lE: F(), lW: F(), lT: F(), lB: F(), pFix: F(), pTrk: F(), pIdl: F(),
-      mode: new Uint8Array(M), mov: new Uint8Array(M), dA: new Int8Array(M), dB: new Int8Array(M), flag: new Uint8Array(M)
-    };
-    var events = [];
-    var src = { fix: newSrc(p.socStart), trk: newSrc(p.socStart), idl: newSrc(p.socStart) };
-
-    function stepSrc(st, pvW, i, clockH, log) {
-      var vb = 11.0 + 1.7 * st.soc / 100, floor = 100 - p.dod;
-      var pG = st.gridOn, pS = st.nonShed, pC = st.cut;
-      if (p.gridMode === 'on') st.gridOn = true;
-      else if (p.gridMode === 'off') st.gridOn = false;
-      else if (!st.gridOn && st.soc < p.gridThr) st.gridOn = true;
-      else if (st.gridOn && st.soc >= p.gridThr + 5) st.gridOn = false;
-      if (st.soc < p.shedThr) st.nonShed = true; else if (st.soc >= p.shedThr + 5) st.nonShed = false;
-      if (!st.gridOn && st.soc <= floor) st.cut = true; else if (st.gridOn || st.soc >= floor + 3) st.cut = false;
-
-      var blown = st.blownLeft > 0;
-      if (blown) st.blownLeft--;
-
-      var loadW = 0, shedding = false;
-      if (!blown && !st.cut) {
-        LOAD_KEYS.forEach(function (k) {
-          var L = p.loads[k];
-          if (!L.on || !hourIn(clockH, L.s, L.e)) return;
-          if (!L.ess && st.nonShed) { shedding = true; return; }
-          loadW += p.loadMult * L.W / L.eff;
-        });
-        loadW += 1.8;                                 /* ESP32 + السيرفوهات */
+  // full-page electricity: circuit traces, travelling current, lightning, sparks
+  var c=document.getElementById('fx'), x=c.getContext('2d');
+  var W,H,tr=[],pl=[],bolts=[],sp=[],mx=-999,my=-999,A='#35e0ff',V='#ffb627',last=0,fl=0,mv=0,lt=0;
+  window.fxColors=function(){var s=getComputedStyle(root); A=s.getPropertyValue('--accent').trim()||A; V=s.getPropertyValue('--wire').trim()||V;};
+  var D=[[1,0],[1,1],[0,1],[-1,1],[-1,0],[-1,-1],[0,-1],[1,-1]];
+  function build(){
+    var d=Math.min(devicePixelRatio||1,2); W=innerWidth; H=innerHeight; c.width=W*d; c.height=H*d; x.setTransform(d,0,0,d,0,0); tr=[]; pl=[];
+    var g=26, n=Math.min(60,Math.round(W*H/20000));
+    for(var i=0;i<n;i++){
+      var px=Math.round(Math.random()*W/g)*g, py=Math.round(Math.random()*H/g)*g, k=Math.random()*8|0, p=[[px,py]], L=[0], T=0;
+      for(var j=0;j<7;j++){
+        var m=(2+Math.random()*5|0)*g, nx=px+D[k][0]*m, ny=py+D[k][1]*m;
+        if(nx<0||nx>W||ny<0||ny>H) break;
+        T+=Math.hypot(nx-px,ny-py); p.push([nx,ny]); L.push(T); px=nx; py=ny; k=(k+(Math.random()<.5?1:7))%8;
       }
-      var gridW = (st.gridOn && !blown) ? loadW : 0;
-      var batW = loadW - gridW;
-      var ibd = batW / vb;
-
-      if (!blown && ibd > FUSE_A) {
-        st.trips++; st.blownLeft = FUSE_RESET_STEPS;
-        if (log) events.push({ i: i, text: 'قطع الفيوز 5 A (تيار تفريغ ' + ibd.toFixed(1) + ' A)' });
-      }
-      var ichg = Math.min(pvW * CHG_EFF / vb, CHG_MAX);
-      if (st.soc > 95) ichg *= Math.max(0.1, (100 - st.soc) / 5);
-      var inet = ichg - ibd;
-
-      st.socA[i] = st.soc; st.pvA[i] = pvW; st.gridA[i] = gridW; st.batA[i] = batW;
-      st.vbA[i] = vb; st.ibA[i] = inet; st.ilA[i] = loadW / vb;
-      st.eCharge += ichg * vb * DT_H; st.ePV += pvW * DT_H; st.eGrid += gridW * DT_H;
-      st.eBat += Math.max(0, batW) * DT_H; st.eLoad += loadW * DT_H;
-      if (shedding) st.shedSteps++;
-      if (st.cut) st.cutSteps++;
-      st.soc = clamp(st.soc + inet * DT_H / CAP * 100, 0, 100);
-
-      if (log) {
-        if (st.gridOn !== pG) events.push({ i: i, text: st.gridOn ? 'تحويل للشبكة (SOC ' + st.soc.toFixed(0) + ' %)' : 'فصل الشبكة والرجوع للبطارية' });
-        if (st.nonShed !== pS) events.push({ i: i, text: st.nonShed ? 'فصل الأحمال غير الأساسية' : 'رجوع الأحمال غير الأساسية' });
-        if (st.cut !== pC) events.push({ i: i, text: st.cut ? 'قطع كامل: وصلت حد عمق التفريغ' : 'رجوع الأحمال بعد الشحن' });
-      }
+      if(p.length>2){var t={p:p,L:L,T:T}; tr.push(t); pl.push({t:t,d:Math.random()*T,v:70+Math.random()*130,c:Math.random()<.6});}
     }
-
-    var g = Math.PI / 2, b = PARK_TILT * D2R, stowed = false;
-    var gF = Math.PI, bF = 30 * D2R;
-    var dA = p.delta * D2R, cA = Math.cos(dA), sA = Math.sin(dA), tanD = Math.tan(dA);
-    var DB = p.db * D2R, GAIN = p.gain, slewStep = p.slew * D2R * DT_MIN;
-    var maxB = 85 * D2R;
-
-    for (var i = 0; i < M; i++) {
-      var minute = Math.floor(i / SUB), clockH = i * DT_H / 1;
-      clockH = i * DT_S / 3600;
-      var sp = sunPos(p.day, clockH), sv = sunVec(sp), sinEl = Math.max(0, Math.sin(sp.el));
-      var dniC = p.peak * Math.pow(sinEl, 0.6), dni = dniC * cloudF[minute];
-      var dh = (0.10 + 0.20 * p.cloud / 100) * dniC * sinEl;
-      var elDeg = sp.el * R2D;
-
-      var n = nrm(g, b), ta = tAz(g), tt = tTi(g, b);
-      var sE = dni * Math.max(0, dot(sv, comb(n, ta, cA, sA)));
-      var sW = dni * Math.max(0, dot(sv, comb(n, ta, cA, -sA)));
-      var sT = dni * Math.max(0, dot(sv, comb(n, tt, cA, sA)));
-      var sB = dni * Math.max(0, dot(sv, comb(n, tt, cA, -sA)));
-      var eA = (sE - sW) / (sE + sW + 1), eB = (sT - sB) / (sT + sB + 1);
-      var light = sE + sW + sT + sB, thA = eA / tanD, thB = eB / tanD;
-
-      if (p.wind > WIND_STOW) stowed = true; else if (p.wind < WIND_RESUME) stowed = false;
-
-      var dg = 0, db = 0, mode = 0, instant = false;
-      var parkNow = elDeg <= DAY_MIN_EL;
-      if (stowed) {
-        mode = 2; db = clampSym(STOW_TILT * D2R - b, slewStep);
-      } else if (p.trackMode === 'ideal') {
-        instant = true; mode = parkNow ? 3 : 1;
-        var tgI = parkNow ? PARK_TILT * D2R : clamp(Math.PI / 2 - sp.el, 0, maxB);
-        dg = parkNow ? wrapPi(Math.PI / 2 - g) : wrapPi(sp.az - g);
-        db = tgI - b;
-      } else if (p.trackMode === 'astro') {
-        if (parkNow) { mode = 3; dg = clampSym(wrapPi(Math.PI / 2 - g), slewStep); db = clampSym(PARK_TILT * D2R - b, slewStep); }
-        else { mode = 1; dg = clampSym(wrapPi(sp.az - g), slewStep); db = clampSym(clamp(Math.PI / 2 - sp.el, 0, maxB) - b, slewStep); }
-      } else {
-        if (parkNow) { mode = 3; dg = clampSym(wrapPi(Math.PI / 2 - g), slewStep); db = clampSym(PARK_TILT * D2R - b, slewStep); }
-        else if (light > LIGHT_MIN) {
-          mode = 1;
-          if (Math.abs(thA) > DB) dg = clampSym(GAIN * thA, slewStep);
-          if (Math.abs(thB) > DB) db = clampSym(GAIN * thB, slewStep);
-        } else mode = 0;
-      }
-
-      g += dg; b = clamp(b + db, 0, maxB);
-      var moving = (Math.abs(dg) + Math.abs(db)) > 1e-7 ? 1 : 0;
-
-      var n2 = nrm(g, b);
-      var pTrk = p.panelW * (dni * Math.max(0, dot(sv, n2)) + dh * (1 + Math.cos(b)) / 2) / 1000 * PANEL_EFF;
-      var nF = nrm(gF, bF);
-      var pFix = p.panelW * (dni * Math.max(0, dot(sv, nF)) + dh * (1 + Math.cos(bF)) / 2) / 1000 * PANEL_EFF;
-      var bI = Math.PI / 2 - Math.max(sp.el, 0);
-      var pIdl = p.panelW * (dni + dh * (1 + Math.cos(bI)) / 2) / 1000 * PANEL_EFF;
-
-      stepSrc(src.fix, pFix, i, clockH, false);
-      stepSrc(src.trk, pTrk, i, clockH, true);
-      stepSrc(src.idl, pIdl, i, clockH, false);
-
-      out.el[i] = sp.el; out.az[i] = sp.az; out.gT[i] = g; out.bT[i] = b;
-      out.eA[i] = eA; out.eB[i] = eB;
-      out.errT[i] = Math.acos(clamp(dot(sv, n2), -1, 1)) * R2D;
-      out.errE[i] = Math.sqrt(thA * thA + thB * thB) * R2D;
-      out.spd[i] = (Math.abs(dg) + Math.abs(db)) * R2D / DT_S;
-      out.lE[i] = sE; out.lW[i] = sW; out.lT[i] = sT; out.lB[i] = sB;
-      out.pFix[i] = pFix; out.pTrk[i] = pTrk; out.pIdl[i] = pIdl;
-      out.mode[i] = mode; out.mov[i] = moving;
-      out.dA[i] = dg > 0 ? 1 : dg < 0 ? -1 : 0;
-      out.dB[i] = db > 0 ? 1 : db < 0 ? -1 : 0;
-      out.flag[i] = (src.trk.gridOn ? 1 : 0) | (src.trk.nonShed ? 2 : 0) | (src.trk.cut ? 4 : 0) | (src.trk.blownLeft > 0 ? 8 : 0);
-    }
-    return { out: out, src: src, events: events };
   }
-
-  /* ================= الاستيفاء بين الخطوات (لحركة سلسة) ================= */
-  function state(tf) {
-    var i0 = Math.floor(tf), i1 = Math.min(M - 1, i0 + 1), f = tf - i0;
-    function L(a) { return a[i0] + (a[i1] - a[i0]) * f; }
-    function A(a) { return a[i0] + wrapPi(a[i1] - a[i0]) * f; }
-    return {
-      el: L(O.el), az: A(O.az), gT: L(O.gT), bT: L(O.bT), eA: L(O.eA), eB: L(O.eB),
-      errT: L(O.errT), errE: L(O.errE), spd: O.spd[i0],
-      lE: L(O.lE), lW: L(O.lW), lT: L(O.lT), lB: L(O.lB),
-      pFix: L(O.pFix), pTrk: L(O.pTrk), pIdl: L(O.pIdl),
-      mov: O.mov[i0], dA: O.dA[i0], dB: O.dB[i0], mode: O.mode[i0], flag: O.flag[i0], i: i0,
-      vb: R.src.trk.vbA[i0], ib: R.src.trk.ibA[i0], il: R.src.trk.ilA[i0]
-    };
-  }
-
-  /* ================= المشهد ثلاثي الأبعاد ================= */
-  var YAW = -35 * D2R, PITCH = 22 * D2R, SC = 190, CX = 230, CY = 230;
-  function proj(p) {
-    var x = p[0], y = p[1], z = p[2];
-    var cy = Math.cos(YAW), sy = Math.sin(YAW);
-    var X = x * cy - y * sy, Y = x * sy + y * cy;
-    var cp = Math.cos(PITCH), sp = Math.sin(PITCH);
-    var Z2 = Y * sp + z * cp;
-    return [CX + X * SC, CY - Z2 * SC];
-  }
-  function addv(a, b, s) { return [a[0] + b[0] * s, a[1] + b[1] * s, a[2] + b[2] * s]; }
-  function pt(q) { var s = proj(q); return s[0].toFixed(1) + ',' + s[1].toFixed(1); }
-  function seg(a, b, attrs) { var A = proj(a), B = proj(b); return '<line x1="' + A[0].toFixed(1) + '" y1="' + A[1].toFixed(1) + '" x2="' + B[0].toFixed(1) + '" y2="' + B[1].toFixed(1) + '" ' + (attrs || '') + '/>'; }
-
-  function drawScene(S) {
-    var g = S.gT, b = S.bT;
-    var sv = sunVec({ el: S.el, az: S.az });
-    var n = nrm(g, b), ta = tAz(g), tt = tTi(g, b);
-    var H = 0.74, Pv = [0, 0, H], c = addv(Pv, n, 0.14), A = 0.36, Bh = 0.24;
-    var lit = S.el > 0, s = '';
-
-    var disk = [];
-    for (var a = 0; a < 48; a++) { var th = a / 48 * 2 * Math.PI; disk.push(pt([0.95 * Math.cos(th), 0.95 * Math.sin(th), 0])); }
-    s += '<polygon points="' + disk.join(' ') + '" fill="var(--subtle)" stroke="var(--border)" stroke-width="1"/>';
-    for (var k = -0.9; k <= 0.91; k += 0.3) {
-      s += seg([k, -0.9, 0], [k, 0.9, 0], 'class="gl" opacity=".6"');
-      s += seg([-0.9, k, 0], [0.9, k, 0], 'class="gl" opacity=".6"');
-    }
-    [['شمال', [0, 1.02, 0]], ['شرق', [1.02, 0, 0]], ['جنوب', [0, -1.02, 0]], ['غرب', [-1.02, 0, 0]]].forEach(function (l) {
-      var q = proj(l[1]); s += '<text x="' + q[0].toFixed(1) + '" y="' + q[1].toFixed(1) + '" text-anchor="middle">' + l[0] + '</text>';
+  function pt(t,d){var i=1; while(i<t.L.length-1&&t.L[i]<d) i++; var a=t.p[i-1],b=t.p[i],u=Math.max(0,Math.min(1,(d-t.L[i-1])/(t.L[i]-t.L[i-1]||1))); return [a[0]+(b[0]-a[0])*u,a[1]+(b[1]-a[1])*u];}
+  function nodes(){var a=[]; tr.forEach(function(t){a.push(t.p[0],t.p[t.p.length-1])}); return a;}
+  function near(N,q,max,skip){var best=null,bd=max; N.forEach(function(n){var d=Math.hypot(n[0]-q[0],n[1]-q[1]); if(d<bd&&d>1&&n!==skip){bd=d;best=n}}); return best;}
+  function mk(a,b){var p=[a,b]; for(var k=0;k<4;k++){var q=[p[0]]; for(var i=1;i<p.length;i++){var u=p[i-1],v=p[i],dx=v[0]-u[0],dy=v[1]-u[1],l=Math.hypot(dx,dy)||1,r=(Math.random()-.5)*l*.45; q.push([(u[0]+v[0])/2-dy/l*r,(u[1]+v[1])/2+dx/l*r],v);} p=q;} return p;}
+  function path(p){x.beginPath(); p.forEach(function(q,i){i?x.lineTo(q[0],q[1]):x.moveTo(q[0],q[1])});}
+  function glow(p,f,w){x.strokeStyle=A; x.shadowColor=A; x.shadowBlur=20; x.lineWidth=w*4; x.globalAlpha=.18*f; path(p); x.stroke(); x.shadowBlur=0; x.strokeStyle='#fff'; x.lineWidth=w; x.globalAlpha=f; path(p); x.stroke();}
+  function strike(a,b){var p=mk(a,b), s=p[3+Math.random()*10|0], br=mk(s,[s[0]+(Math.random()-.5)*200,s[1]+70+Math.random()*90]);
+    bolts.push({p:p,b:br,life:.3,t:.3}); fl=.5; for(var k=0;k<10;k++) sp.push({x:b[0],y:b[1],vx:(Math.random()-.5)*260,vy:(Math.random()-.9)*220,l:.6});}
+  function frame(ts){
+    var dt=Math.max(Math.min((ts-last)/1000,.05),0); last=ts; x.clearRect(0,0,W,H); x.lineJoin='round'; x.lineCap='round'; x.lineWidth=1.2;
+    tr.forEach(function(t){x.strokeStyle=A; x.globalAlpha=.13; path(t.p); x.stroke(); x.globalAlpha=.3; [t.p[0],t.p[t.p.length-1]].forEach(function(q){x.beginPath(); x.arc(q[0],q[1],3,0,7); x.stroke();});});
+    pl.forEach(function(q){
+      if(!reduce) q.d+=q.v*dt; if(q.d>q.t.T+60) q.d=-30; var col=q.c?A:V, a=pt(q.t,Math.max(q.d-45,0)), b=pt(q.t,Math.min(Math.max(q.d,0),q.t.T));
+      if(q.d<0||q.d-45>q.t.T) return; x.strokeStyle=col; x.globalAlpha=.25; x.lineWidth=6; x.beginPath(); x.moveTo(a[0],a[1]); x.lineTo(b[0],b[1]); x.stroke();
+      x.globalAlpha=.9; x.lineWidth=2; x.stroke(); x.fillStyle='#fff'; x.beginPath(); x.arc(b[0],b[1],2,0,7); x.fill();
     });
-
-    var shadowOf = function (q) { var t = q[2] / sv[2]; return [q[0] - sv[0] * t, q[1] - sv[1] * t, 0]; };
-    if (lit && S.el > 8 * D2R) {
-      var p1 = addv(addv(c, ta, A), tt, Bh), p2 = addv(addv(c, ta, -A), tt, Bh);
-      var p3 = addv(addv(c, ta, -A), tt, -Bh), p4 = addv(addv(c, ta, A), tt, -Bh);
-      s += '<polygon points="' + [p1, p2, p3, p4].map(function (q) { return pt(shadowOf(q)); }).join(' ') + '" fill="var(--fg)" fill-opacity=".14"/>';
-      var sb = proj([0, 0, 0]), st2 = proj(shadowOf(Pv));
-      s += '<line x1="' + sb[0] + '" y1="' + sb[1] + '" x2="' + st2[0] + '" y2="' + st2[1] + '" stroke="var(--fg)" stroke-opacity=".14" stroke-width="7" stroke-linecap="round"/>';
+    if(!reduce){
+      bolts=bolts.filter(function(o){o.life-=dt; var f=Math.max(o.life/o.t,0)*(.5+Math.random()*.5); glow(o.p,f,1.6); glow(o.b,f*.7,1); return o.life>0;});
+      sp=sp.filter(function(s){s.l-=dt; s.x+=s.vx*dt; s.y+=s.vy*dt; s.vy+=500*dt; x.globalAlpha=Math.max(s.l,0); x.fillStyle=V; x.fillRect(s.x,s.y,2,2); return s.l>0;});
+      if(fl>0){x.globalAlpha=fl*.07; x.fillStyle=A; x.fillRect(0,0,W,H); fl-=dt*5;}
+      requestAnimationFrame(frame);
     }
-    if (lit) {
-      var sunP = proj(addv([0, 0, 0], sv, 1.25)), cc = proj(c);
-      s += '<line x1="' + sunP[0] + '" y1="' + sunP[1] + '" x2="' + cc[0] + '" y2="' + cc[1] + '" stroke="var(--ray)" stroke-width="1.2" stroke-dasharray="5 5" opacity=".55"/>';
-      s += '<circle cx="' + sunP[0].toFixed(1) + '" cy="' + sunP[1].toFixed(1) + '" r="13" fill="var(--sun)"/>';
-    }
-
-    var pB = proj([0, 0, 0]), pT = proj(Pv);
-    var dx = pT[0] - pB[0], dy = pT[1] - pB[1], Ln = Math.hypot(dx, dy) || 1;
-    var nx = -dy / Ln, ny = dx / Ln, wB = 9, wT = 6;
-    s += '<polygon points="' + (pB[0] + nx * wB).toFixed(1) + ',' + (pB[1] + ny * wB).toFixed(1) + ' ' + (pT[0] + nx * wT).toFixed(1) + ',' + (pT[1] + ny * wT).toFixed(1) + ' ' + (pT[0] - nx * wT).toFixed(1) + ',' + (pT[1] - ny * wT).toFixed(1) + ' ' + (pB[0] - nx * wB).toFixed(1) + ',' + (pB[1] - ny * wB).toFixed(1) + '" fill="#9aa3ae" stroke="#6b7480" stroke-width=".8"/>';
-    s += '<ellipse cx="' + pB[0].toFixed(1) + '" cy="' + pB[1].toFixed(1) + '" rx="16" ry="5" fill="#6b7480"/>';
-    s += '<text x="' + (pB[0] + 22).toFixed(1) + '" y="' + (pB[1] + 4).toFixed(1) + '">عمود</text>';
-
-    var aP = proj(addv(c, n, -0.05));
-    s += '<line x1="' + pT[0].toFixed(1) + '" y1="' + pT[1].toFixed(1) + '" x2="' + aP[0].toFixed(1) + '" y2="' + aP[1].toFixed(1) + '" stroke="#7a8594" stroke-width="5" stroke-linecap="round"/>';
-
-    var q1 = addv(addv(c, ta, A), tt, Bh), q2 = addv(addv(c, ta, -A), tt, Bh);
-    var q3 = addv(addv(c, ta, -A), tt, -Bh), q4 = addv(addv(c, ta, A), tt, -Bh);
-    var quad = [q1, q2, q3, q4].map(function (q) { return pt(q); }).join(' ');
-    s += '<polygon points="' + quad + '" fill="var(--panel)" stroke="var(--panel-hi)" stroke-width="2"/>';
-    var sheen = Math.max(0, dot(sv, n));
-    s += '<polygon points="' + quad + '" fill="#ffffff" fill-opacity="' + (0.04 + 0.28 * sheen).toFixed(2) + '"/>';
-    for (var r = 1; r < 4; r++) { var f = -Bh + r * 2 * Bh / 4; s += seg(addv(addv(c, ta, -A), tt, f), addv(addv(c, ta, A), tt, f), 'stroke="var(--panel-hi)" stroke-width=".8" opacity=".7"'); }
-    for (var q5 = 1; q5 < 6; q5++) { var f2 = -A + q5 * 2 * A / 6; s += seg(addv(addv(c, ta, f2), tt, -Bh), addv(addv(c, ta, f2), tt, Bh), 'stroke="var(--panel-hi)" stroke-width=".8" opacity=".7"'); }
-
-    var sAz = proj(Pv), sTi = proj(addv(Pv, n, 0.07));
-    s += '<circle cx="' + sAz[0].toFixed(1) + '" cy="' + sAz[1].toFixed(1) + '" r="9" fill="var(--card)" stroke="var(--fg)" stroke-width="1.2"/>';
-    s += '<circle cx="' + sTi[0].toFixed(1) + '" cy="' + sTi[1].toFixed(1) + '" r="7" fill="var(--card)" stroke="var(--fg)" stroke-width="1.2"/>';
-
-    var nT = proj(addv(c, n, 0.42)), cP = proj(c);
-    s += '<line x1="' + cP[0].toFixed(1) + '" y1="' + cP[1].toFixed(1) + '" x2="' + nT[0].toFixed(1) + '" y2="' + nT[1].toFixed(1) + '" stroke="var(--c-trk)" stroke-width="2.4"/>';
-    s += '<circle cx="' + nT[0].toFixed(1) + '" cy="' + nT[1].toFixed(1) + '" r="3.5" fill="var(--c-trk)"/>';
-
-    if (S.mov) {
-      var arrow = function (dir, vec, origin) {
-        if (!dir) return;
-        var len = 0.34, tip = addv(origin, vec, len * dir), base = addv(origin, vec, (len - 0.14) * dir);
-        var A1 = proj(tip), B1 = proj(base), side = [vec[1] * 0.04, -vec[0] * 0.04, 0];
-        var Lp = proj(addv(base, side, 1)), Rp = proj(addv(base, side, -1));
-        s += '<line x1="' + B1[0].toFixed(1) + '" y1="' + B1[1].toFixed(1) + '" x2="' + A1[0].toFixed(1) + '" y2="' + A1[1].toFixed(1) + '" stroke="var(--c-mot)" stroke-width="2.4"/>';
-        s += '<polygon points="' + A1[0].toFixed(1) + ',' + A1[1].toFixed(1) + ' ' + Lp[0].toFixed(1) + ',' + Lp[1].toFixed(1) + ' ' + Rp[0].toFixed(1) + ',' + Rp[1].toFixed(1) + '" fill="var(--c-mot)"/>';
-      };
-      arrow(S.dA, ta, Pv); arrow(S.dB, tt, c);
-    }
-
-    [[addv(c, ta, A * 0.92), 'شرق', S.lE], [addv(c, ta, -A * 0.92), 'غرب', S.lW],
-     [addv(c, tt, Bh * 0.92), 'أعلى', S.lT], [addv(c, tt, -Bh * 0.92), 'أسفل', S.lB]].forEach(function (sn) {
-      var q = proj(sn[0]), v = Math.min(1, sn[2] / 900);
-      s += '<circle cx="' + q[0].toFixed(1) + '" cy="' + q[1].toFixed(1) + '" r="6" fill="rgba(245,180,0,' + (0.15 + 0.85 * v).toFixed(2) + ')" stroke="var(--fg)" stroke-width=".7"/>';
-      s += '<text x="' + q[0].toFixed(1) + '" y="' + (q[1] - 9).toFixed(1) + '" text-anchor="middle">' + sn[1] + '</text>';
-    });
-    $('#scene').innerHTML = s;
+    x.globalAlpha=1;
   }
-
-  /* ================= البوصلة ================= */
-  function drawCompass(S) {
-    var g = S.gT, b = S.bT, el = S.el, az = S.az, C = 120, Rr = 92;
-    var s = '<circle cx="' + C + '" cy="' + C + '" r="' + Rr + '" fill="none" stroke="var(--border)" stroke-width="1.5"/>';
-    s += '<circle cx="' + C + '" cy="' + C + '" r="' + Rr / 2 + '" fill="none" stroke="var(--subtle)" stroke-width="1"/>';
-    [['ش', 0], ['ق', 90], ['ج', 180], ['غ', 270]].forEach(function (d) {
-      var a = d[1] * D2R, x = C + (Rr + 12) * Math.sin(a), y = C - (Rr + 12) * Math.cos(a);
-      s += '<text x="' + x.toFixed(1) + '" y="' + (y + 4).toFixed(1) + '" text-anchor="middle" class="big">' + d[0] + '</text>';
-    });
-    var rs = Rr * (1 - Math.max(0, el) / (Math.PI / 2));
-    var sx = C + rs * Math.sin(az), sy = C - rs * Math.cos(az);
-    if (el > 0) s += '<circle cx="' + sx.toFixed(1) + '" cy="' + sy.toFixed(1) + '" r="9" fill="var(--sun)"/>';
-    else s += '<text x="' + C + '" y="' + (C + 4) + '" text-anchor="middle" class="big">ليل</text>';
-    var len = Rr * Math.sin(b), fx = C + len * Math.sin(g), fy = C - len * Math.cos(g);
-    s += '<line x1="' + C + '" y1="' + C + '" x2="' + fx.toFixed(1) + '" y2="' + fy.toFixed(1) + '" stroke="var(--c-trk)" stroke-width="5" stroke-linecap="round"/>';
-    s += '<circle cx="' + C + '" cy="' + C + '" r="4" fill="var(--fg)"/>';
-    if (el > 0) s += '<line x1="' + fx.toFixed(1) + '" y1="' + fy.toFixed(1) + '" x2="' + sx.toFixed(1) + '" y2="' + sy.toFixed(1) + '" stroke="var(--c-err)" stroke-width="1.2" stroke-dasharray="3 3"/>';
-    $('#compass').innerHTML = s;
-  }
-
-  /* ================= الرسوم ================= */
-  var CX0 = 60, CX1 = 980;
-  function Xs(j) { return CX0 + j / (M - 1) * (CX1 - CX0); }
-  function drawLines(svgId, series, yMax, yLabel, cursorTag) {
-    var H0 = 10, H1 = 170;
-    function y(v) { return H1 - v / yMax * (H1 - H0); }
-    var s = '';
-    var step = yMax / 4;
-    for (var v = 0; v <= yMax + 0.001; v += step) {
-      s += '<line x1="' + CX0 + '" y1="' + y(v).toFixed(1) + '" x2="' + CX1 + '" y2="' + y(v).toFixed(1) + '" class="gl"/>';
-      s += '<text x="' + (CX0 - 8) + '" y="' + (y(v) + 4).toFixed(1) + '" text-anchor="end">' + Math.round(v) + '</text>';
-    }
-    for (var hh = 0; hh <= 24; hh += 3) {
-      var x = Xs(Math.min(hh * 720, M - 1));
-      s += '<line x1="' + x.toFixed(1) + '" y1="' + H0 + '" x2="' + x.toFixed(1) + '" y2="' + H1 + '" class="gl"/>';
-      s += '<text x="' + x.toFixed(1) + '" y="' + (H1 + 15) + '" text-anchor="middle">' + pad(hh % 24) + ':00</text>';
-    }
-    series.forEach(function (sr) {
-      var pts = [];
-      for (var j = 0; j < M; j += SUB) pts.push(Xs(j).toFixed(1) + ',' + y(sr.arr[j]).toFixed(1));
-      s += '<polyline points="' + pts.join(' ') + '" fill="none" stroke="' + sr.col + '" stroke-width="' + (sr.w || 1.8) + '"' + (sr.dash ? ' stroke-dasharray="5 4"' : '') + '/>';
-    });
-    s += '<line id="' + cursorTag + '-c" x1="0" x2="0" y1="' + H0 + '" y2="' + H1 + '" stroke="var(--fg)" stroke-width="1.2" opacity=".5"/>';
-    $(svgId).innerHTML = s;
-  }
-  function drawCharts() {
-    var o = R.src, mx = 1;
-    for (var j = 0; j < M; j += SUB) mx = Math.max(mx, O.pIdl[j], O.pTrk[j], O.pFix[j]);
-    var pMax = Math.ceil(mx * 1.1 / 10) * 10;
-    drawLines('#chartPV', [
-      { arr: O.pFix, col: 'var(--c-fix)' }, { arr: O.pTrk, col: 'var(--c-trk)', w: 2.2 }, { arr: O.pIdl, col: 'var(--c-ideal)', dash: true }
-    ], pMax, 'W', 'pv');
-    drawLines('#chartSOC', [
-      { arr: o.fix.socA, col: 'var(--c-fix)' }, { arr: o.trk.socA, col: 'var(--c-trk)', w: 2.2 }, { arr: o.idl.socA, col: 'var(--c-ideal)', dash: true }
-    ], 100, '%', 'soc');
-    drawGen('#chartV', [{ arr: R.src.trk.vbA, col: 'var(--c-trk)', w: 2.2 }], null, null, 'V');
-    drawGen('#chartI', [{ arr: R.src.trk.ibA, col: 'var(--c-trk)', w: 2.2 }, { arr: R.src.trk.ilA, col: 'var(--c-load)', dash: true }], null, null, 'A');
-    updateCursorLines();
-  }
-  function updateCursorLines() {
-    var x = Xs(TF);
-    ['pv', 'soc', 'vv', 'ii'].forEach(function (t) { var c = $('#' + t + '-c'); if (c) { c.setAttribute('x1', x.toFixed(1)); c.setAttribute('x2', x.toFixed(1)); } });
-  }
-
-  /* ================= الجدول والقراءات ================= */
-  function renderCompare() {
-    var rows = [['fix', 'تركيب ثابت (30°، جنوب)'], ['trk', 'متتبع (' + ({ ldr: 'LDR', astro: 'فلكي', ideal: 'مثالي' }[P.trackMode]) + ')'], ['idl', 'مثالي (سقف)']];
-    var eFix = R.src.fix.ePV;
-    var h = '<thead><tr><th>المصدر</th><th>طاقة اللوح (Wh)</th><th>كسب مقابل الثابت</th><th>مخزّنة في البطارية (Wh)</th><th>كفاءة الشحن</th><th>شبكة (Wh)</th><th>SOC النهاية</th><th>فيوز</th><th>دقايق فصل</th></tr></thead><tbody>';
-    var bestCh = -1, bestKey = '';
-    rows.forEach(function (r) { var st = R.src[r[0]], eff = st.ePV > 0 ? st.eCharge / st.ePV * 100 : 0; if (eff > bestCh) { bestCh = eff; bestKey = r[0]; } });
-    rows.forEach(function (r) {
-      var st = R.src[r[0]];
-      var gain = eFix > 0 ? (st.ePV / eFix - 1) * 100 : 0;
-      var eff = st.ePV > 0 ? st.eCharge / st.ePV * 100 : 0;
-      h += '<tr class="' + (r[0] === 'trk' ? 'best' : '') + '"><td>' + r[1] + '</td>' +
-        '<td class="n">' + st.ePV.toFixed(1) + '</td>' +
-        '<td class="n">' + (r[0] === 'fix' ? '—' : (gain >= 0 ? '+' : '') + gain.toFixed(1) + ' %') + '</td>' +
-        '<td class="n">' + st.eCharge.toFixed(1) + '</td>' +
-        '<td class="n">' + eff.toFixed(1) + ' %</td>' +
-        '<td class="n">' + st.eGrid.toFixed(1) + '</td>' +
-        '<td class="n">' + st.socA[M - 1].toFixed(1) + ' %</td>' +
-        '<td class="n">' + st.trips + '</td>' +
-        '<td class="n">' + Math.round(st.shedSteps * DT_S / 60) + '</td></tr>';
-    });
-    $('#cmp').innerHTML = h + '</tbody>';
-
-    var t = R.src.trk, f = R.src.fix, msgs = [];
-    var gain = eFix > 0 ? (t.ePV / eFix - 1) * 100 : 0;
-    msgs.push('المتتبع (' + (gain >= 0 ? '+' : '') + gain.toFixed(1) + ' %) مقابل التركيب الثابت في الطاقة المولدة.');
-    msgs.push('كفاءة الشحن للمتتبع ' + (t.ePV > 0 ? (t.eCharge / t.ePV * 100).toFixed(1) : '0') + ' %، وده بيشمل كفاءة الـ MPPT وتأثير حد الشحن عند الامتلاء.');
-    if (t.cutSteps > 0) msgs.push('<span style="color:var(--bad)">حصل قطع حماية للبطارية لمدة ' + Math.round(t.cutSteps * DT_S / 60) + ' دقيقة.</span>');
-    if (t.trips > 0) msgs.push('<span style="color:var(--bad)">الفيوز قطع ' + t.trips + ' مرة في المتتبع.</span>');
-    if (f.eGrid + t.eGrid > 0) msgs.push('الشبكة ساعدت بـ ' + (t.eGrid).toFixed(0) + ' Wh في المتتبع.');
-    $('#verdict').innerHTML = msgs.map(function (m) { return '<div>• ' + m + '</div>'; }).join('');
-  }
-
-  function renderAll() {
-    var S = state(TF);
-    var rows = [
-      ['الوقت', hhmmss(T)],
-      ['ارتفاع الشمس', (S.el * R2D).toFixed(1) + '°'],
-      ['اتجاه الشمس', (S.az * R2D).toFixed(1) + '°'],
-      ['ميل اللوح / اتجاهه', (S.bT * R2D).toFixed(1) + '° / ' + ((S.gT * R2D % 360 + 360) % 360).toFixed(1) + '°'],
-      ['الخطأ الحقيقي', S.el > 0 ? S.errT.toFixed(2) + '°' : '—'],
-      ['الخطأ المُقدَّر من LDR', S.el > 0 ? S.errE.toFixed(2) + '°' : '—'],
-      ['سرعة السيرفو الفعلية', S.spd.toFixed(1) + ' °/ث'],
-      ['جهد البطارية', S.vb.toFixed(2) + ' V'],
-      ['تيار البطارية (+شحن / −تفريغ)', (S.ib >= 0 ? '+' : '') + S.ib.toFixed(2) + ' A'],
-      ['تيار الحمل', S.il.toFixed(2) + ' A'],
-      ['القدرة: ثابت / متتبع / مثالي', S.pFix.toFixed(1) + ' / ' + S.pTrk.toFixed(1) + ' / ' + S.pIdl.toFixed(1) + ' W']
-    ];
-    $('#readout').innerHTML = rows.map(function (r) { return '<div><span class="k">' + r[0] + '</span><span>' + r[1] + '</span></div>'; }).join('');
-    var MODE = ['ثبات: غيوم أو ضوء ضعيف', 'تتبع نشط', 'حماية الرياح: مسطح', 'ركن ليلي شرقاً'];
-    var bd = [[MODE[S.mode], S.mode === 1 ? 'badge ok' : S.mode === 2 ? 'badge bad' : 'badge'],
-      [S.mov ? 'السيرفو بيتحرك' : 'السيرفو ثابت', S.mov ? 'badge warn' : 'badge'],
-      [S.flag & 8 ? 'فيوز مقطوع (المتتبع)' : (S.flag & 4 ? 'قطع حماية البطارية' : (S.flag & 1 ? 'المتتبع على الشبكة' : 'المتتبع على البطارية')), S.flag & 12 ? 'badge bad' : (S.flag & 1 ? 'badge warn' : 'badge')]];
-    $('#badges').innerHTML = bd.map(function (x) { return '<span class="' + x[1] + '">' + x[0] + '</span>'; }).join('');
-    drawScene(S);
-    drawCompass(S);
-    updateCursorLines();
-  }
-
-  /* ================= جدول الأحمال ================= */
-  function buildLoadTable() {
-    var h = '<thead><tr><th>الحمل</th><th>يشتغل</th><th>أساسي</th><th>من (ساعة)</th><th>لحد (ساعة)</th><th>القدرة (W)</th></tr></thead><tbody>';
-    LOAD_KEYS.forEach(function (k) {
-      var L = P.loads[k];
-      h += '<tr><td>' + L.name + '</td>' +
-        '<td><input type="checkbox" data-k="' + k + '" data-f="on"' + (L.on ? ' checked' : '') + '></td>' +
-        '<td><input type="checkbox" data-k="' + k + '" data-f="ess"' + (L.ess ? ' checked' : '') + '></td>' +
-        '<td><input type="number" min="0" max="23" data-k="' + k + '" data-f="s" value="' + L.s + '"></td>' +
-        '<td><input type="number" min="0" max="23" data-k="' + k + '" data-f="e" value="' + L.e + '"></td>' +
-        '<td><input type="number" min="1" max="200" data-k="' + k + '" data-f="W" value="' + L.W + '"></td></tr>';
-    });
-    $('#loadtbl').innerHTML = h + '</tbody>';
-  }
-  $('#loadtbl').addEventListener('change', function (e) {
-    var el = e.target, k = el.dataset.k, f = el.dataset.f;
-    if (!k) return;
-    if (el.type === 'checkbox') P.loads[k][f] = el.checked;
-    else P.loads[k][f] = clamp(+el.value, f === 'W' ? 1 : 0, f === 'W' ? 200 : 23);
-    runSim();
+  fxColors(); build(); requestAnimationFrame(frame);
+  var rt,lw=innerWidth; addEventListener('resize',function(){clearTimeout(rt); rt=setTimeout(function(){if(innerWidth!==lw||Math.abs(innerHeight-H)>150){lw=innerWidth; build(); if(reduce) frame(0)}},200)});
+  addEventListener('pointermove',function(e){
+    var ox=mx, oy=my; mx=e.clientX; my=e.clientY; root.style.setProperty('--mx',mx+'px'); root.style.setProperty('--my',my+'px');
+    if(reduce||ox<0) return; mv+=Math.hypot(mx-ox,my-oy); var now=performance.now();
+    if(mv>50&&now-lt>130){var a=near(nodes(),[mx,my],320); if(a){strike(a,[mx,my]); lt=now; mv=0;}}
   });
+  root.addEventListener('pointerleave',function(){mx=my=-999; root.style.removeProperty('--mx'); root.style.removeProperty('--my');});
 
-  /* ================= التحكم ================= */
-  function setT(v) {
-    TF = clamp(v, 0, M - 1); T = Math.floor(TF);
-    $('#scrub').value = T; $('#scrub-t').textContent = hhmmss(T);
-    var hrs = T * DT_S / 3600; $('#tm').value = pad(Math.floor(hrs)) + ':' + pad(Math.floor((hrs % 1) * 60));
-    renderAll();
-  }
-  function syncControls() {
-    $('#date').value = dateFromDay(P.day);
-    $('#cloud').value = P.cloud; $('#cloud-v').textContent = P.cloud + ' %';
-    $('#peak').value = P.peak; $('#peak-v').textContent = P.peak + ' W/m²';
-    $('#panelW').value = P.panelW; $('#panelW-v').textContent = P.panelW + ' W';
-    $('#loadMult').value = P.loadMult; $('#loadMult-v').textContent = '×' + P.loadMult.toFixed(2);
-    $('#socStart').value = P.socStart; $('#socStart-v').textContent = P.socStart + ' %';
-    $('#dod').value = P.dod;
-    $('#gridMode').value = P.gridMode;
-    $('#gridThr').value = P.gridThr; $('#gridThr-v').textContent = P.gridThr + ' %';
-    $('#shedThr').value = P.shedThr; $('#shedThr-v').textContent = P.shedThr + ' %';
-    $('#trackMode').value = P.trackMode;
-    $('#wind').value = P.wind; $('#wind-v').textContent = P.wind + ' م/ث' + (P.wind > WIND_STOW ? ' (حماية)' : '');
-    $('#slew').value = P.slew; $('#slew-v').textContent = P.slew + ' °/د';
-    $('#db').value = P.db; $('#db-v').textContent = P.db.toFixed(1) + '°';
-    $('#gain').value = P.gain; $('#gain-v').textContent = P.gain.toFixed(2);
-    $('#delta').value = P.delta; $('#delta-v').textContent = P.delta + '°';
-    $('#wear').value = P.wear; $('#wear-v').textContent = P.wear.toFixed(1);
-    var floor = 100 - P.dod;
-    $('#floor-note').textContent = 'عمق التفريغ ' + P.dod + ' % يعني الأحمال كلها تتقطع عند SOC ' + floor + ' % لو الشبكة مش شغالة. الشبكة بتشتغل تحت ' + P.gridThr + ' %، والأحمال غير الأساسية بتتفصل تحت ' + P.shedThr + ' %.';
-  }
-  function clearPresets() { document.querySelectorAll('#presets button').forEach(function (x) { x.setAttribute('aria-pressed', 'false'); }); }
-  function runSim() {
-    O = null;
-    var r = simulate(P);
-    R = r; O = r.out;
-    drawCharts(); renderCompare(); setT(TF);
-  }
-  function applyRun() { P.seed = PRESET_SEEDS[P.day] || 7; runSim(); }
+  // extras: download links, scroll progress, floating button, card glow
+  var d0=document.getElementById('dl'), fab=document.getElementById('fab');
+  document.querySelectorAll('.dl2').forEach(function(a){a.href=d0.href});
+  function sc(){var m=root.scrollHeight-innerHeight; root.style.setProperty('--p',m>0?Math.min(scrollY/m,1):0); fab.classList.toggle('on',scrollY>innerHeight*.7);}
+  addEventListener('scroll',sc,{passive:true}); sc();
+  document.addEventListener('pointermove',function(e){var n=e.target.closest&&e.target.closest('.note'); if(n){var r=n.getBoundingClientRect(); n.style.setProperty('--gx',e.clientX-r.left+'px'); n.style.setProperty('--gy',e.clientY-r.top+'px');}});
 
-  var bind = function (id, key, conv, label) {
-    $(id).addEventListener('input', function (e) {
-      P[key] = conv(e.target.value); syncControls(); applyRun();
-    });
-  };
-  bind('#cloud', 'cloud', Number);
-  bind('#peak', 'peak', Number);
-  bind('#panelW', 'panelW', Number);
-  bind('#loadMult', 'loadMult', Number);
-  bind('#socStart', 'socStart', Number);
-  bind('#gridThr', 'gridThr', Number);
-  bind('#shedThr', 'shedThr', Number);
-  bind('#wind', 'wind', Number);
-  bind('#slew', 'slew', Number);
-  bind('#db', 'db', Number);
-  bind('#gain', 'gain', Number);
-  bind('#delta', 'delta', Number);
-  bind('#wear', 'wear', Number);
-  $('#dod').addEventListener('change', function (e) { P.dod = +e.target.value; syncControls(); applyRun(); });
-  $('#gridMode').addEventListener('change', function (e) { P.gridMode = e.target.value; applyRun(); });
-  $('#trackMode').addEventListener('change', function (e) { P.trackMode = e.target.value; applyRun(); });
-  $('#date').addEventListener('change', function (e) { P.day = dayFromDate(e.target.value); clearPresets(); syncControls(); applyRun(); });
-  $('#presets').addEventListener('click', function (e) {
-    var b2 = e.target.closest('button'); if (!b2) return;
-    P.day = +b2.dataset.d; clearPresets(); b2.setAttribute('aria-pressed', 'true');
-    syncControls(); applyRun();
-  });
-  $('#tm').addEventListener('change', function (e) {
-    var parts = e.target.value.split(':'); var hrs = (+parts[0]) + (+parts[1] || 0) / 60;
-    setT(hrs * 3600 / DT_S);
-  });
-  $('#scrub').addEventListener('input', function (e) { setT(+e.target.value); });
-  $('#speed').addEventListener('change', function (e) { speed = +e.target.value; });
-  $('#btn-play').addEventListener('click', function () {
-    playing = !playing;
-    this.textContent = playing ? 'إيقاف ⏸' : 'تشغيل ▶';
-    if (playing && TF >= M - 1) setT(0);
-    lastFrame = 0;
-    if (playing) requestAnimationFrame(step);
-  });
-  function step(now) {
-    if (!playing) return;
-    if (!lastFrame) lastFrame = now;
-    var dt = (now - lastFrame) / 1000; lastFrame = now;
-    setT(TF + dt * speed * SUB);
-    if (TF >= M - 1) { playing = false; $('#btn-play').textContent = 'تشغيل ▶'; return; }
-    requestAnimationFrame(step);
+  // AI code helper: builds a ready prompt; opens Claude/ChatGPT, or calls your own endpoint if AI_ENDPOINT is set
+  var AI_ENDPOINT=''; // اختياري: رابط الـ proxy بتاعك (POST {prompt} ويرجّع {text}) عشان التوليد يتم جوه الصفحة
+  var aq=document.getElementById('aiQ'), ab=document.getElementById('aiBoard'), am=document.getElementById('aiMsg'), ao=document.getElementById('aiOut');
+  function ar(){return root.lang==='ar'}
+  function setPh(){aq.placeholder=aq.getAttribute('data-'+root.lang)}
+  setPh(); new MutationObserver(setPh).observe(root,{attributes:true,attributeFilter:['lang']});
+  document.querySelectorAll('.chip').forEach(function(b){b.addEventListener('click',function(){aq.value=b.querySelector('.'+root.lang).textContent; aq.focus();})});
+  function ask(){
+    var q=aq.value.trim(); if(!q){aq.focus(); am.textContent=ar()?'اكتب الأول إنت عاوز الكود يعمل إيه.':'Describe what the code should do first.'; return null;}
+    am.textContent=''; var b=ab.value;
+    return ar()?'اكتب لي كود Arduino كامل وجاهز للرفع على لوحة '+b+'.\nالمطلوب: '+q+'\nعاوزك تدّيني: 1) الكود كامل بتعليقات بالعربي 2) جدول توصيلات الأطراف (pins) بين اللوح والقطع 3) أي مكتبات لازم أثبتها 4) شرح مختصر لطريقة الرفع من Arduino IDE.'
+      :'Write complete, upload-ready Arduino code for the '+b+' board.\nRequirement: '+q+'\nPlease give me: 1) the full code with comments 2) a pin wiring table between the board and parts 3) any libraries I need to install 4) a short note on uploading from Arduino IDE.';
   }
-
-  var themes = ['auto', 'light', 'dark'], ti = 0, LABEL = { auto: 'الوضع: تلقائي', light: 'الوضع: فاتح', dark: 'الوضع: داكن' };
-  $('#btn-theme').addEventListener('click', function () {
-    ti = (ti + 1) % themes.length;
-    if (themes[ti] === 'auto') document.documentElement.removeAttribute('data-theme');
-    else document.documentElement.setAttribute('data-theme', themes[ti]);
-    this.textContent = LABEL[themes[ti]];
-  });
-  $('#btn-print').addEventListener('click', function () { window.print(); });
-
-
-  /* ================= رسم عام بمقياس تلقائي ================= */
-  function drawGen(svgId, series, yMin, yMax, unit) {
-    var tag = svgId === '#chartV' ? 'vv' : 'ii';
-    if (yMin === null) {
-      yMin = Infinity; yMax = -Infinity;
-      series.forEach(function (sr) { for (var j = 0; j < M; j += SUB) { var v = sr.arr[j]; if (v < yMin) yMin = v; if (v > yMax) yMax = v; } });
-      var padY = (yMax - yMin) * 0.1 || 0.5; yMin -= padY; yMax += padY;
-    }
-    var H0 = 10, H1 = 170;
-    function y(v) { return H1 - (v - yMin) / (yMax - yMin) * (H1 - H0); }
-    var s = '';
-    for (var k = 0; k <= 4; k++) {
-      var v2 = yMin + (yMax - yMin) * k / 4;
-      s += '<line x1="' + CX0 + '" y1="' + y(v2).toFixed(1) + '" x2="' + CX1 + '" y2="' + y(v2).toFixed(1) + '" class="gl"/>';
-      s += '<text x="' + (CX0 - 8) + '" y="' + (y(v2) + 4).toFixed(1) + '" text-anchor="end">' + v2.toFixed(unit === 'V' ? 2 : 1) + '</text>';
-    }
-    for (var hh = 0; hh <= 24; hh += 3) {
-      var x = Xs(Math.min(hh * 720, M - 1));
-      s += '<line x1="' + x.toFixed(1) + '" y1="' + H0 + '" x2="' + x.toFixed(1) + '" y2="' + H1 + '" class="gl"/>';
-      s += '<text x="' + x.toFixed(1) + '" y="' + (H1 + 15) + '" text-anchor="middle">' + pad(hh % 24) + ':00</text>';
-    }
-    series.forEach(function (sr) {
-      var pts = [];
-      for (var j = 0; j < M; j += SUB) pts.push(Xs(j).toFixed(1) + ',' + y(sr.arr[j]).toFixed(1));
-      s += '<polyline points="' + pts.join(' ') + '" fill="none" stroke="' + sr.col + '" stroke-width="' + (sr.w || 1.8) + '"' + (sr.dash ? ' stroke-dasharray="5 4"' : '') + '/>';
-    });
-    s += '<line id="' + tag + '-c" x1="0" x2="0" y1="' + H0 + '" y2="' + H1 + '" stroke="var(--fg)" stroke-width="1.2" opacity=".5"/>';
-    $(svgId).innerHTML = s;
+  function go(base){var p=ask(); if(p) window.open(base+encodeURIComponent(p),'_blank','noopener');}
+  document.getElementById('aiClaude').addEventListener('click',function(){go('https://claude.ai/new?q=')});
+  document.getElementById('aiGpt').addEventListener('click',function(){go('https://chatgpt.com/?q=')});
+  document.getElementById('aiCopy').addEventListener('click',function(){var p=ask(); if(!p) return;
+    try{navigator.clipboard.writeText(p).then(function(){am.textContent=ar()?'تم نسخ الطلب، الصقه في أي مساعد ذكاء اصطناعي.':'Prompt copied. Paste it into any AI assistant.'})}catch(e){am.textContent=p}});
+  if(AI_ENDPOINT){
+    var g=document.getElementById('aiGen'); g.hidden=false;
+    g.addEventListener('click',function(){var p=ask(); if(!p) return; ao.style.display='block'; ao.textContent='…';
+      fetch(AI_ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({prompt:p})})
+        .then(function(r){return r.json()}).then(function(d){ao.textContent=d.text||d.error||'—'})
+        .catch(function(){ao.textContent=ar()?'حصل خطأ في الاتصال.':'Connection error.'});});
   }
-
-  /* ================= حفظ الأيام ================= */
-  var STORE_KEY = 'solarSim.days';
-  function loadDays() { try { return JSON.parse(localStorage.getItem(STORE_KEY) || '[]'); } catch (e) { return []; } }
-  function saveDays(list) { try { localStorage.setItem(STORE_KEY, JSON.stringify(list)); return true; } catch (e) { return false; } }
-  function r1(v) { return Math.round(v * 10) / 10; }
-  function downs(arr) { var out = []; for (var j = 0; j < M; j += SUB) out.push(Math.round(arr[j] * 100) / 100); return out; }
-  function saveToday() {
-    var list = loadDays(), t = R.src.trk, f = R.src.fix, d = R.src.idl;
-    var rec = {
-      id: Date.now(), date: $('#date').value, day: P.day, params: JSON.parse(JSON.stringify(P)),
-      summary: { trkWh: r1(t.ePV), fixWh: r1(f.ePV), idlWh: r1(d.ePV), chgEffTrk: r1(t.ePV > 0 ? t.eCharge / t.ePV * 100 : 0), gridTrk: r1(t.eGrid), socEnd: r1(t.socA[M - 1]), trips: t.trips },
-      curves: { pvTrk: downs(O.pTrk), pvFix: downs(O.pFix), vb: downs(t.vbA), ib: downs(t.ibA), il: downs(t.ilA), soc: downs(t.socA) }
-    };
-    list.unshift(rec);
-    if (!saveDays(list)) { alert('المساحة المحفوظة ممتلئة. احذف أيام قديمة أو صدّرها أولاً.'); return; }
-    renderDays();
-  }
-  function renderDays() {
-    var list = loadDays();
-    if (!list.length) { $('#days').innerHTML = '<div class="note">ما فيش أيام محفوظة لسه.</div>'; return; }
-    $('#days').innerHTML = list.map(function (r) {
-      return '<div class="day-row"><span>' + r.date + '</span><span class="note">ترك ' + r.summary.trkWh + ' Wh · ثابت ' + r.summary.fixWh + ' Wh · كفاءة شحن ' + r.summary.chgEffTrk + ' % · شبكة ' + r.summary.gridTrk + ' Wh</span>' +
-        '<span><button type="button" data-act="load" data-id="' + r.id + '">حمّل</button> <button type="button" data-act="del" data-id="' + r.id + '">احذف</button></span></div>';
-    }).join('');
-  }
-  function loadDay(id) {
-    var rec = loadDays().filter(function (r) { return String(r.id) === String(id); })[0];
-    if (!rec) return;
-    var keep = JSON.parse(JSON.stringify(rec.params));
-    Object.keys(keep).forEach(function (k) { P[k] = keep[k]; });
-    clearPresets(); syncControls(); buildLoadTable(); applyRun();
-  }
-  function deleteDay(id) { saveDays(loadDays().filter(function (r) { return String(r.id) !== String(id); })); renderDays(); }
-  function exportDays() {
-    var blob = new Blob([JSON.stringify(loadDays(), null, 1)], { type: 'application/json' });
-    var a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'solar-days.json'; a.click();
-  }
-
-  /* ================= التحسين (بحث شبكي) ================= */
-  var lastTop = [], prevP = null;
-  function evalParams(q) {
-    var r = simulate(q), t = r.src.trk;
-    var cutMin = t.cutSteps * DT_S / 60, served = t.eLoad - t.eGrid;
-    var depth = q.dod / 100;
-    var wearCost = q.wear * depth * depth * t.eBat * 0.5;   /* التفريغ العميق بيقصّر عمر البطارية */
-    return { score: served - 5 * t.trips - 0.5 * cutMin - wearCost, served: served, grid: t.eGrid, trips: t.trips, cutMin: cutMin, wear: wearCost, p: q };
-  }
-  function optimize() {
-    var all = [];
-    [20, 30, 40].forEach(function (g) { [5, 10, 15].forEach(function (sh) { [50, 70, 90].forEach(function (dd) {
-      var q = JSON.parse(JSON.stringify(P));
-      q.gridThr = g; q.shedThr = sh; q.dod = dd; q.gridMode = 'auto';
-      all.push(evalParams(q));
-    }); }); });
-    all.sort(function (a, b) { return b.score - a.score; });
-    lastTop = all.slice(0, 5).map(function (e) { return { gridThr: e.p.gridThr, shedThr: e.p.shedThr, dod: e.p.dod, score: r1(e.score), served: r1(e.served), grid: r1(e.grid), trips: e.trips }; });
-    return all[0];
-  }
-  function showOptTable() {
-    var h = '<thead><tr><th>الترتيب</th><th>عتبة الشبكة</th><th>فصل غير الأساسي</th><th>عمق التفريغ</th><th>الطاقة المخدومة (Wh)</th><th>شبكة (Wh)</th><th>فيوز</th><th>النتيجة</th></tr></thead><tbody>';
-    lastTop.forEach(function (c, i) {
-      h += '<tr><td>' + (i + 1) + '</td><td class="n">' + c.gridThr + ' %</td><td class="n">' + c.shedThr + ' %</td><td class="n">' + c.dod + ' %</td><td class="n">' + c.served + '</td><td class="n">' + c.grid + '</td><td class="n">' + c.trips + '</td><td class="n">' + c.score + '</td></tr>';
-    });
-    $('#opt-tbl').innerHTML = h + '</tbody>';
-  }
-  function applySettings(q) {
-    P.gridThr = q.gridThr; P.shedThr = q.shedThr; P.dod = q.dod;
-    if (q.trackMode) P.trackMode = q.trackMode;
-    syncControls(); applyRun();
-  }
-  $('#btn-opt').addEventListener('click', function () {
-    $('#opt-msg').textContent = 'جاري التجربة على 27 إعداد...';
-    setTimeout(function () {
-      prevP = JSON.parse(JSON.stringify(P));
-      var best = optimize();
-      showOptTable();
-      applySettings({ gridThr: best.p.gridThr, shedThr: best.p.shedThr, dod: best.p.dod });
-      $('#btn-undo').disabled = false;
-      $('#opt-msg').textContent = 'أفضل إعداد اتطبق: شبكة تحت ' + best.p.gridThr + ' %، فصل غير أساسي تحت ' + best.p.shedThr + ' %، عمق تفريغ ' + best.p.dod + ' %. النتيجة ' + r1(best.score) + '.';
-    }, 30);
-  });
-  $('#btn-undo').addEventListener('click', function () {
-    if (!prevP) return;
-    P = JSON.parse(JSON.stringify(prevP)); syncControls(); buildLoadTable(); applyRun();
-    this.disabled = true; $('#opt-msg').textContent = 'رجعنا للإعداد السابق.';
-  });
-
-  /* ================= الاتصال بنموذج ذكاء اصطناعي (اختياري) ================= */
-  function setAiMsg(t) { $('#ai-msg').textContent = t; }
-  $('#btn-ai').addEventListener('click', function () {
-    var url = $('#ai-url').value.trim();
-    if (!/^https?:\/\//.test(url)) { setAiMsg('أدخل رابط https صحيح أولاً.'); return; }
-    var t = R.src.trk;
-    var payload = {
-      day: P.day, params: P, summary: { trkWh: t.ePV, fixWh: R.src.fix.ePV, idlWh: R.src.idl.ePV, chgEff: t.ePV > 0 ? t.eCharge / t.ePV : 0, gridWh: t.eGrid, batteryWh: t.eBat, socEnd: t.socA[M - 1], trips: t.trips, cutMin: t.cutSteps * DT_S / 60 },
-      candidates: lastTop
-    };
-    setAiMsg('جاري الإرسال...');
-    fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-App-Token': $('#ai-token').value }, body: JSON.stringify(payload) })
-      .then(function (r) { return r.json(); })
-      .then(function (j) {
-        if (j.gridThr === undefined || j.shedThr === undefined || j.dod === undefined) throw new Error('الرد لازم يحتوي gridThr و shedThr و dod');
-        var q = { gridThr: clamp(+j.gridThr, 15, 50), shedThr: clamp(+j.shedThr, 5, 30), dod: [50, 70, 80, 90].indexOf(+j.dod) >= 0 ? +j.dod : 70 };
-        if (['ldr', 'astro', 'ideal'].indexOf(j.trackMode) >= 0) q.trackMode = j.trackMode;
-        prevP = JSON.parse(JSON.stringify(P));
-        applySettings(q); $('#btn-undo').disabled = false;
-        setAiMsg('الاقتراح اتطبق' + (j.note ? ': ' + j.note : '.'));
-      })
-      .catch(function (err) { setAiMsg('ما قدرناش نطبق الرد: ' + err.message); });
-  });
-
-  /* ================= أزرار الأيام ================= */
-  $('#btn-save').addEventListener('click', saveToday);
-  $('#btn-export').addEventListener('click', exportDays);
-  $('#days').addEventListener('click', function (e) {
-    var b3 = e.target.closest('button[data-act]'); if (!b3) return;
-    if (b3.dataset.act === 'load') loadDay(b3.dataset.id);
-    else if (b3.dataset.act === 'del') deleteDay(b3.dataset.id);
-  });
-  renderDays();
-
-  /* ================= بدء ================= */
-  buildLoadTable();
-  document.querySelector('#presets button[data-d="304"]').setAttribute('aria-pressed', 'true');
-  syncControls();
-  applyRun();
 })();
 </script>
-<script>if("serviceWorker" in navigator){navigator.serviceWorker.register("sw.js");}</script>
 </body>
 </html>
